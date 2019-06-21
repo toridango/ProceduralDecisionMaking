@@ -5,6 +5,18 @@
 [Bb]uilds/
 Assets/AssetStoreTools*
 
+Assets/SampleScenes
+Assets/Standard Assets/Cameras
+Assets/Standard Assets/CrossPlatformInput
+Assets/Standard Assets/Editor
+Assets/Standard Assets/Effects
+Assets/Standard Assets/Environment
+Assets/Standard Assets/Fonts
+Assets/Standard Assets/ParticleSystems
+Assets/Standard Assets/PhysicsMaterials
+Assets/Standard Assets/Prototyping
+Assets/Standard Assets/Utility
+
 # Visual Studio cache directory
 .vs/
 
@@ -34,3 +46,4 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+
