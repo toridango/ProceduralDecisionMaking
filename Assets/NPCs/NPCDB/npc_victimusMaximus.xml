@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+ 
+<npc name = "Victimus Maximus">
+    <!-- -100 to 100 -->
+    <personality>
+        <caution>-100</caution>
+        <carelessness>100</carelessness>
+        <extraversion>0</extraversion>
+        <friendliness>25</friendliness>
+        <confidence>-25</confidence>
+    </personality>
+
+    <!-- 0 to 100 -->
+    <skills>
+        <pickpocket>0</pickpocket>
+        <stealth>0</stealth>
+        <carisma>30</carisma>
+        <crafts>75</crafts>
+        <combat>60</combat>
+    </skills>
+
+    <!-- 0 to 100 -->
+    <pseudoskills>
+        <wealth>10</wealth>
+        <appeal>10</appeal>
+        <fitness>50</fitness>
+    </pseudoskills>
+
+    <!-- -100 to 100 -->
+    <allegiances>
+    </allegiances>
+
+    <dialog>
+        <page id = "root">
+            <premise>Hello, stranger. Could you hold my wallet while I untie my shoes?</premise>
+            <option pointer = "q0">Oh god... Sorry I must leave</option>
+        </page>
+      <page id = "q0">
+        <premise></premise>
+      </page>
+    </dialog>
+
+</npc>

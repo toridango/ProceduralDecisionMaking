@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+ 
+<npc name = "Ethan">
+    <!-- -100 to 100 -->
+    <personality>
+        <caution>0</caution>
+        <carelessness>0</carelessness>
+        <extraversion>0</extraversion>
+        <friendliness>0</friendliness>
+        <confidence>0</confidence>
+    </personality>
+
+    <!-- 0 to 100 -->
+    <skills>
+        <pickpocket>10</pickpocket>
+        <stealth>10</stealth>
+        <carisma>30</carisma>
+        <crafts>40</crafts>
+        <combat>20</combat>
+    </skills>
+
+    <!-- 0 to 100 -->
+    <pseudoskills>
+        <wealth>20</wealth>
+        <appeal>20</appeal>
+        <fitness>50</fitness>
+    </pseudoskills>
+
+    <!-- -100 to 100 -->
+    <allegiances>
+    </allegiances>
+
+    <dialog>
+        <page id = "root">
+            <premise>Hello, stranger. What brings you through these parts?</premise>
+            <option pointer = "1">*inquire about your stolen sweet roll*</option>
+            <option pointer = "2">*inquire about the frequency with which he visits the cloud district*</option>
+            <option pointer = "aApple">[Mind Trick] "Get me an apple"</option>
+            <option pointer = "q0">Sorry, I can't talk right now</option>
+        </page>
+        <page id = "1">
+            <premise>No, but someone lost their arrow and it ended up in my knee</premise>
+            <option pointer = "2">*inquire about the frequency with which he visits the cloud district*</option>
+            <option pointer = "aApple">[Mind Trick] "Get me an apple"</option>
+            <option pointer = "q0">I can't talk more right now</option>
+        </page>
+        <page id = "2">
+            <premise>... Fuck off</premise>
+            <option pointer = "1">*inquire about your stolen sweet roll*</option>
+            <option pointer = "aApple">[Mind Trick] "Get me an apple"</option>
+            <option pointer = "q0">I can't talk more right now</option>
+        </page>
+        <page id = "aApple">
+            <premise>Will do</premise>
+        </page>
+        <page id = "q0">
+            <premise>Bye</premise>
+        </page>
+    </dialog>
+
+</npc>
