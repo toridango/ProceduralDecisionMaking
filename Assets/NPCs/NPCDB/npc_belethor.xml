@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+ 
+<npc name = "Belethor">
+    <!-- -100 to 100 -->
+    <personality>
+        <caution>0</caution>
+        <carelessness>-20</carelessness>
+        <conscience>-10</conscience>
+        <friendliness>0</friendliness>
+        <confidence>0</confidence>
+    </personality>
+
+    <!-- 0 to 100 -->
+    <skills>
+        <pickpocket>10</pickpocket>
+        <stealth>10</stealth>
+        <carisma>60</carisma>
+        <crafts>40</crafts>
+        <combat>20</combat>
+    </skills>
+
+    <!-- 0 to 100 -->
+    <pseudoskills>
+        <wealth>80</wealth>
+        <appeal>20</appeal>
+        <fitness>20</fitness>
+    </pseudoskills>
+
+    <!-- -100 to 100 -->
+    <allegiances>
+      <player>0</player>
+    </allegiances>
+
+    <dialog>
+        <page id = "root">
+            <premise>Everything's for sale, my friend. Everything. If I had a sister, I'd sell her in a second</premise>
+            <option pointer = "q1">[1 silver] I want to buy an apple</option>
+            <option pointer = "q0">Sorry, I don't want anything at the moment</option>
+        </page>
+        <page id = "q1">
+            <premise>Do come back.</premise>
+        </page>
+        <page id = "q0">
+            <premise>I'd even buy one of your relatives, if you're looking to sell! Ha ha ha... That's a little joke.</premise>
+        </page>
+    </dialog>
+
+</npc>

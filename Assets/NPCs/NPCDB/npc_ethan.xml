@@ -5,7 +5,7 @@
     <personality>
         <caution>0</caution>
         <carelessness>0</carelessness>
-        <extraversion>0</extraversion>
+        <conscience>0</conscience>
         <friendliness>0</friendliness>
         <confidence>0</confidence>
     </personality>
@@ -28,6 +28,7 @@
 
     <!-- -100 to 100 -->
     <allegiances>
+      <player>100</player>
     </allegiances>
 
     <dialog>

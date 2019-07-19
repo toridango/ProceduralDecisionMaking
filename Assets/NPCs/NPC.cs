@@ -121,7 +121,14 @@ public class NPC : MonoBehaviour
             case "aApple":
             {
                 string skillUse = "pickpocket";
-                    CarryOut(code, skillUse);
+                string target = "NPC_VictimusMaximus";
+                    Debug.Log(m_pseudoSkills["wealth"]);
+                if (m_pseudoSkills["wealth"] < 75)
+                {
+                    skillUse = "pay";
+                    target = "NPC_Belethor";
+                }
+                GetItem(target, skillUse);
                 break;
             }
             default:
@@ -129,14 +136,37 @@ public class NPC : MonoBehaviour
         }
     }
 
-    private void CarryOut(string questCode, string skillUse)
+    private void GetItem(string target, string skillUse)
     {
-        PushOverheadMessage("Pickpocketing...");
-        GameObject targetGO = GameObject.Find("NPC_VictimusMaximus");
+
+        switch(skillUse)
+        {
+            case "pickpocket":
+            {
+                PushOverheadMessage("Pickpocketing...");
+                GetComponent<AICharacterControl>().SetDestination(GetDestinationForNPC(target), true);
+                break;
+            }
+            case "pay":
+            {
+                PushOverheadMessage("Paying...");
+                GetComponent<AICharacterControl>().SetDestination(GetDestinationForNPC(target), true);
+                break;
+            }
+            default:
+                break;
+        }
+
+    }
+
+    private Vector3 GetDestinationForNPC(string npc)
+    {
+        GameObject targetGO = GameObject.Find(npc);
         Vector3 targPos = targetGO.GetComponent<Transform>().position;
         Vector3 iniPos = gameObject.GetComponent<Transform>().position;
         Vector3 dest = iniPos + (targPos - iniPos) - m_NPCProximityRadius * (targPos - iniPos).normalized;
-        GetComponent<AICharacterControl>().SetDestination(dest, true);
+
+        return dest;
     }
 
 
