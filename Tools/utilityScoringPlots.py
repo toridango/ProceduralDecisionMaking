@@ -18,15 +18,24 @@ class NPC:
     # <!-- -100 to 100 -->
     # <allegiances>
 
-    attr = {}
 
 
-    def __init__(self, xmlTree):
+    def __init__(self):
+        self.attr = {}
+    
+    
+    def loadFromFile(self, filename):
+        tree = ET.parse(filename)
+        root = tree.getroot()
+        self.loadFromXMLTree(root)
+
+    def loadFromXMLTree(self, xmlTree):
         # print(xmlTree.)
-        for child in xmlTree.getchildren():          
-            self.attr[child.tag] = {}  
-            for grandchild in child.getchildren():
-                self.attr[child.tag][grandchild.tag] = float(grandchild.text)
+        for child in xmlTree.getchildren():
+            if child.tag != "dialog":
+                self.attr[child.tag] = {}  
+                for grandchild in child.getchildren():
+                    self.attr[child.tag][grandchild.tag] = float(grandchild.text)
 
     def printAttributes(self):
         for k in self.attr:
@@ -49,13 +58,14 @@ class NPC:
                                     self.attr["personality"]["carelessness"]
                                     )
         ))
-        utilities.append(("Persuade", persuadeFunc(perceivedSkill(
+        utilities.append(("Persuade", 
+                                    persuadeFunc(perceivedSkill(
                                     self.attr["skills"]["charisma"], self.attr["personality"]["confidence"]),
                                     self.attr["personality"]["friendliness"]
                                     )
         ))
-        utilities.append(("Intimidate", intimidateFunc(
-                                    perceivedSkill(self.attr["skills"]["combat"], self.attr["personality"]["confidence"]),
+        utilities.append(("Intimidate", 
+                                    intimidateFunc(perceivedSkill(self.attr["skills"]["combat"], self.attr["personality"]["confidence"]),
                                     self.attr["personality"]["friendliness"]
                                     )
         ))
@@ -67,7 +77,7 @@ class NPC:
         utilities.sort(key = lambda x: x[1])
 
         for u in utilities:
-            print(u[0], u[1])
+            print("\t"+u[0], u[1])
 
 
 
@@ -92,7 +102,7 @@ def plotConfidenceSlope():
 
     x = np.arange(-100.0, 100.0, 1.0)
     y = np.array([confidenceSlope(xi) for xi in x])
-    plt.figure()
+    plt.figure(1)
     plt.xlabel('confidence')
     plt.ylabel('slope for real-to-perceived line')
     plt.title('Slope of skill perception vs confidence')
@@ -113,7 +123,7 @@ def perceivedSkill(skill, confidence):
 def plotPerceivedSkill(confidence):
 
     x = np.arange(0.0, 100.0, 1.0)
-    plt.figure()
+    plt.figure(2)
     plt.xlabel('real skill')
     plt.ylabel('perceived skill')
     plt.title('Perceived vs real skill given confidence: {}'.format(str(confidence)))
@@ -138,7 +148,7 @@ def stealFunc(conscience, p_pickpocket, p_stealth):
 def plotSteal(pickpocket, stealth, confidence):
 
     x = np.arange(-100.0, 100.0, 1.0)
-    plt.figure()
+    plt.figure(3)
     plt.xlabel('Conscience')
     plt.ylabel('Utility')
     plt.title('Steal utility given stealth: {}, pickpocket: {}, confidence: {} '.format(str(stealth), str(pickpocket), str(confidence)))
@@ -162,7 +172,7 @@ def buyFunc(wealth, carelessness):
 def plotBuy(wealth, carelessness):
 
     x = np.arange(-100.0, 100.0, 1.0)
-    plt.figure()
+    plt.figure(4)
     plt.xlabel('Carelessness')
     plt.ylabel('Utility')
     plt.title('Buy utility given wealth: {}'.format(str(wealth)))
@@ -188,7 +198,7 @@ def persuadeFunc(charisma, friendliness):
 def plotPersuade(friendliness):
 
     x = np.arange(0.0, 100.0, 1.0)
-    plt.figure()
+    plt.figure(5)
     plt.xlabel('Charisma')
     plt.ylabel('Utility')
     plt.title('Persuade utility given friendliness: {}'.format(str(friendliness)))
@@ -213,7 +223,7 @@ def intimidateFunc(combat, friendliness):
 def plotIntimidate(friendliness):
 
     x = np.arange(0.0, 100.0, 1.0)
-    plt.figure()
+    plt.figure(6)
     plt.xlabel('Combat')
     plt.ylabel('Utility')
     plt.title('Intimidate utility given friendliness: {}'.format(str(friendliness)))
@@ -245,7 +255,7 @@ def plotCraft():
     plt.grid(True)
     ax.axvline(x = 0, color = 'k')
     ax.axhline(y = 0, color = 'k')
-    plt.show()
+    plt.show(7)
 
 
 
@@ -256,11 +266,11 @@ def main():
     xml = '''<?xml version="1.0" encoding="utf-8" ?> 
 <npc name = "tester">
     <personality>
-        <caution>0</caution>
-        <carelessness>0</carelessness>
-        <conscience>0</conscience>
-        <friendliness>0</friendliness>
-        <confidence>0</confidence>
+        <caution>30</caution>
+        <carelessness>-30</carelessness>
+        <conscience>-10</conscience>
+        <friendliness>-10</friendliness>
+        <confidence>20</confidence>
     </personality>
 
     <skills>
@@ -284,7 +294,11 @@ def main():
 
     xmlTree = ET.fromstring(xml)
 
-    tester = NPC(xmlTree)
+    tester = NPC()
+    tester.loadFromXMLTree(xmlTree)
+
+    ethan = NPC()
+    ethan.loadFromFile("../Assets/NPCs/NPCDB/npc_ethan.xml")
 
     # plotConfidenceSlope()
     # plotPerceivedSkill(20)
@@ -299,7 +313,9 @@ def main():
     # plotPersuade(tester.attr["personality"]["friendliness"])
     # plotIntimidate(tester.attr["personality"]["friendliness"])
     # plotCraft()
-    print("aaand...")
+    print("Ethan --------------------------------")
+    ethan.rankGetItem()
+    print("Thief --------------------------------")
     tester.rankGetItem()
 
 

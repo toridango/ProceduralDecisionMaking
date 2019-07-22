@@ -208,7 +208,7 @@ public class DialogManager : MonoBehaviour
 
             if (exitCode.StartsWith("q") || exitCode.StartsWith("a"))
             {
-                StartCoroutine(WaitSecondsAndQuitDialog(2));
+                StartCoroutine(WaitSecondsAndQuitDialog(1));
             }
         }
     }

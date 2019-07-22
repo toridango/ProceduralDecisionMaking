@@ -6,7 +6,7 @@
         <caution>-100</caution>
         <carelessness>100</carelessness>
         <conscience>40</conscience>
-        <friendliness>25</friendliness>
+        <friendliness>75</friendliness>
         <confidence>-25</confidence>
     </personality>
 
@@ -14,7 +14,7 @@
     <skills>
         <pickpocket>0</pickpocket>
         <stealth>0</stealth>
-        <carisma>30</carisma>
+        <charisma>30</charisma>
         <crafts>75</crafts>
         <combat>60</combat>
     </skills>

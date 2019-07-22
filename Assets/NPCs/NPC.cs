@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Xml;
 using UnityEngine;
@@ -116,24 +116,61 @@ public class NPC : MonoBehaviour
 
     private void PreProcessAction(string code)
     {
-        switch(code)
-        {
-            case "aApple":
+        char separator = '_';
+        string[] codeSlices = code.Split(separator);
+        //foreach (string s in codeSlices)
+        //    Debug.Log(s);
+
+        if (codeSlices[0].Equals("a") && codeSlices.Length > 2)
+            switch(codeSlices[1])
             {
-                string skillUse = "pickpocket";
-                string target = "NPC_VictimusMaximus";
-                    Debug.Log(m_pseudoSkills["wealth"]);
-                if (m_pseudoSkills["wealth"] < 75)
+                // Get Item
+                case "gi":
                 {
-                    skillUse = "pay";
-                    target = "NPC_Belethor";
+                    // evaluate "Find" course of action with Scene information before scoring the rest
+
+                    // Evaluate courses of action
+                    List<System.Tuple<string, double>> uS = UtilityScoring.ScoreGetItem(m_personality, m_skills, m_pseudoSkills, -1.0);
+
+                    
+                    string msg = "Sorted scores: ";
+
+                    for(int i = 0; i < uS.Count; ++i)
+                    {
+                        if (uS[i].Item2 > 0)
+                        {
+                            if (i > 0)
+                                msg += ", ";
+                            
+                            msg += uS[i].Item1 + " (" + Math.Round(uS[i].Item2).ToString() + ")";
+
+                        }
+                    }
+                    Debug.Log(msg);
+                    msg = "I will try ";
+
+                    if (uS[0].Item1.EndsWith("e"))
+                        msg += uS[0].Item1.Substring(0, uS[0].Item1.Length - 1) + "ing";
+                    else
+                        msg += uS[0] + "ing";
+
+                    PushOverheadMessage(msg);
+
+
+                    //string skillUse = "pickpocket";
+                    //string target = "NPC_VictimusMaximus";
+                    ////Debug.Log(m_pseudoSkills["wealth"]);
+                    //if (m_pseudoSkills["wealth"] < 75)
+                    //{
+                    //    skillUse = "pay";
+                    //    target = "NPC_Belethor";
+                    //}
+                    //GetItem(target, skillUse);
+                    break;
                 }
-                GetItem(target, skillUse);
-                break;
+                default:
+                    break;
             }
-            default:
-                break;
-        }
     }
 
     private void GetItem(string target, string skillUse)
