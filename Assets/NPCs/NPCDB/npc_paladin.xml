@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+ 
+<npc name = "Paladin Cork">
+    <!-- -100 to 100 -->
+    <personality>
+        <caution>10</caution>
+        <carelessness>-10</carelessness>
+        <conscience>60</conscience>
+        <friendliness>30</friendliness>
+        <confidence>50</confidence>
+    </personality>
+
+    <!-- 0 to 100 -->
+    <skills>
+        <pickpocket>0</pickpocket>
+        <stealth>0</stealth>
+        <charisma>50</charisma>
+        <crafts>20</crafts>
+        <combat>80</combat>
+    </skills>
+
+    <!-- 0 to 100 -->
+    <pseudoskills>
+        <wealth>40</wealth>
+        <appeal>30</appeal>
+        <fitness>70</fitness>
+    </pseudoskills>
+
+    <!-- -100 to 100 -->
+    <allegiances>
+      <player>100</player>
+    </allegiances>
+
+  <dialog>
+    <page id = "root">
+      <premise>Hello, stranger.</premise>
+      <option pointer = "q0">I can't think of anything to say</option>
+    </page>
+    <page id = "q0">
+      <premise>Farewell</premise>
+    </page>
+  </dialog>
+
+</npc>
