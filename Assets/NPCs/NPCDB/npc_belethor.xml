@@ -13,7 +13,7 @@
     <!-- 0 to 100 -->
     <skills>
         <pickpocket>10</pickpocket>
-        <stealth>10</stealth>
+        <stealth>20</stealth>
         <charisma>60</charisma>
         <crafts>40</crafts>
         <combat>20</combat>

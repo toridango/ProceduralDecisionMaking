@@ -27,4 +27,10 @@ public abstract class Node
 
 
     public abstract Status Evaluate();
+
+
+    public void AddChild(Node n)
+    {
+        m_children.Add(n);
+    }
 }

@@ -17,20 +17,21 @@ public class Sequence : Node
 
         foreach (Node n in m_children)
         {
-            switch (n.Evaluate())
-            {
-                case Status.FAILED:
-                    m_status = Status.FAILED;
-                    return m_status;
-                case Status.SUCCEEDED:
-                    continue;
-                case Status.RUNNING:
-                    anyChildRunning = true;
-                    continue;
-                default:
-                    m_status = Status.SUCCEEDED;
-                    return m_status;
-            }
+            if (!anyChildRunning)
+                switch (n.Evaluate())
+                {
+                    case Status.FAILED:
+                        m_status = Status.FAILED;
+                        return m_status;
+                    case Status.SUCCEEDED:
+                        continue;
+                    case Status.RUNNING:
+                        anyChildRunning = true;
+                        continue;
+                    default:
+                        m_status = Status.SUCCEEDED;
+                        return m_status;
+                }
         }
         m_status = anyChildRunning ? Status.RUNNING : Status.SUCCEEDED;
         return m_status;
