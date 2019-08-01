@@ -17,14 +17,11 @@
         <charisma>60</charisma>
         <crafts>40</crafts>
         <combat>20</combat>
-    </skills>
-
-    <!-- 0 to 100 -->
-    <pseudoskills>
+      
         <wealth>80</wealth>
         <appeal>20</appeal>
         <fitness>20</fitness>
-    </pseudoskills>
+    </skills>
 
     <!-- -100 to 100 -->
     <allegiances>

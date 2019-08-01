@@ -12,10 +12,10 @@ public class UtilityScoring
     // Give NPC stats and the utility of find 
     // -1 if it cant be found
     // >0 and proportional to inverse of distance if it can
-    public static List<Tuple<string, double>> ScoreGetItem(Dictionary<string, int> personality, 
-                                    Dictionary<string, int> skills,
-                                    Dictionary<string, int> pseudoSkills,
-                                    double utilityFind)
+    public static List<Tuple<string, double>> ScoreGetItem( Dictionary<string, int> personality, 
+                                                            Dictionary<string, int> skills,
+                                                            double utilityFind,
+                                                            bool craftable)
     {
         List<Tuple<string, double>> uScores = new List<Tuple<string, double>>();
         uScores.Add(new Tuple<string, double>("find", utilityFind));
@@ -28,7 +28,7 @@ public class UtilityScoring
                                                             )));
         uScores.Add(new Tuple<string, double>("buy", 
                                                 UtilityBuy(
-                                                            pseudoSkills["wealth"],
+                                                            skills["wealth"],
                                                             personality["carelessness"]
                                                             )));
         uScores.Add(new Tuple<string, double>("persuade", 
@@ -43,9 +43,98 @@ public class UtilityScoring
                                                             personality["friendliness"],
                                                             personality["confidence"]
                                                             )));
-        uScores.Add(new Tuple<string, double>("craft", 
-                                                UtilityCraft(
+        if(craftable)
+            uScores.Add(new Tuple<string, double>("craft", 
+                                                    UtilityCraft(
+                                                                skills["crafts"],
+                                                                personality["confidence"]
+                                                                )));
+
+        uScores.Sort((x, y) => y.Item2.CompareTo(x.Item2));
+
+        return uScores;
+
+    }
+
+    public static List<Tuple<string, double>> ScoreConvince( Dictionary<string, int> personality,
+                                                            Dictionary<string, int> skills)
+    {
+        List<Tuple<string, double>> uScores = new List<Tuple<string, double>>();
+        uScores.Add(new Tuple<string, double>("bribe",
+                                                UtilityHardBuy(
+                                                            skills["wealth"],
+                                                            personality["carelessness"]
+                                                            )));
+        uScores.Add(new Tuple<string, double>("persuade",
+                                                UtilityHardPersuade(
+                                                            skills["charisma"],
+                                                            personality["friendliness"],
+                                                            personality["confidence"]
+                                                            )));
+        uScores.Add(new Tuple<string, double>("intimidate",
+                                                UtilityHardIntimidate(
+                                                            skills["combat"],
+                                                            personality["friendliness"],
+                                                            personality["confidence"]
+                                                            )));
+
+        uScores.Sort((x, y) => y.Item2.CompareTo(x.Item2));
+
+        return uScores;
+
+    }
+
+    public static List<Tuple<string, double>> ScoreNeutralize(  Dictionary<string, int> personality,
+                                                                Dictionary<string, int> skills,
+                                                                double allegianceToTarget)
+    {
+        List<Tuple<string, double>> uScores = ScoreConvince(personality, skills);
+        uScores.Add(new Tuple<string, double>("fight",
+                                                UtilityFight(
+                                                            skills["combat"],
+                                                            allegianceToTarget,
+                                                            personality["friendliness"],
+                                                            personality["confidence"]
+                                                            )));
+        uScores.Add(new Tuple<string, double>("assassinate",
+                                                UtilityAssassinate(
+                                                            skills["combat"],
+                                                            skills["stealth"],
+                                                            allegianceToTarget,
+                                                            personality["friendliness"],
+                                                            personality["confidence"]
+                                                            )));
+
+        uScores.Sort((x, y) => y.Item2.CompareTo(x.Item2));
+
+        return uScores;
+
+    }
+
+    public static List<Tuple<string, double>> ScoreDevelop(   Dictionary<string, int> personality,
+                                                                Dictionary<string, int> skills)
+    {
+        List<Tuple<string, double>> uScores = new List<Tuple<string, double>>();
+        uScores.Add(new Tuple<string, double>("build",
+                                                UtilityHardCraft(
                                                             skills["crafts"],
+                                                            personality["confidence"]
+                                                            )));
+        uScores.Add(new Tuple<string, double>("outsource",
+                                                UtilityHardBuy(
+                                                            skills["wealth"],
+                                                            personality["carelessness"]
+                                                            )));
+        uScores.Add(new Tuple<string, double>("persuade",
+                                                UtilityHardPersuade(
+                                                            skills["charisma"],
+                                                            personality["friendliness"],
+                                                            personality["confidence"]
+                                                            )));
+        uScores.Add(new Tuple<string, double>("intimidate",
+                                                UtilityHardIntimidate(
+                                                            skills["combat"],
+                                                            personality["friendliness"],
                                                             personality["confidence"]
                                                             )));
 
@@ -109,7 +198,7 @@ public class UtilityScoring
 
         double vertOffset = -100.0;
         double sigmoidSize = 200.0;
-        double xMod = 0.02;
+        double xMod = 0.03;
         double frDivisor = 200;
 
         // friendliness adds to the utility score
@@ -138,4 +227,71 @@ public class UtilityScoring
         return xMod * Math.Pow(c, 2);
 
     }
+    
+
+    private static double UtilityFight(double combat, double allegiance, double confidence, double friendliness)
+    {
+        double c = PerceivedSkill(combat, confidence);
+        double sigmoidHardness = 0.016;
+
+        return -friendliness / 5 + 1.5 * allegiance + -3 * allegiance / (1 + Math.Exp(-sigmoidHardness * c));
+    }
+
+    private static double UtilityAssassinate(double combat, double stealth, double allegiance, double confidence, double friendliness)
+    {
+        double c = PerceivedSkill(combat, confidence);
+        double s = PerceivedSkill(stealth, confidence);
+        double sigmoidHardness = 0.016;
+
+        return -friendliness / 2 + 1.5 * allegiance + -3 * allegiance / (1 + Math.Exp(-sigmoidHardness * Math.Pow(s, 0.5) * Math.Pow(c, 0.333)));
+
+    }
+
+    private static double UtilityHardBuy(double wealth, double carelessness)
+    {
+        double multiplier = 0.4;
+        double padding = 1.1;
+        double xMod = 0.015708;
+
+        return multiplier * wealth * (padding + Math.Sin(xMod * carelessness));
+    }
+
+    private static double UtilityHardPersuade(double charisma, double friendliness, double confidence)
+    {
+        double c = PerceivedSkill(charisma, confidence);
+
+        double vertOffset = -100.0;
+        double sigmoidSize = 200.0;
+        double xMod = 0.02;
+        double frDivisor = 200;
+
+        // friendliness adds to the utility score
+        return vertOffset + sigmoidSize / (1 + Math.Exp(-xMod * c - friendliness / frDivisor));
+    }
+
+    private static double UtilityHardIntimidate(double combat, double friendliness, double confidence)
+    {
+        double c = PerceivedSkill(combat, confidence);
+
+        double vertOffset = -101.0;
+        double sigmoidSize = 200.0;
+        double xMod = 0.02;
+        double frDivisor = 200;
+
+        // friendliness subtracts from the utility score
+        return vertOffset + sigmoidSize / (1 + Math.Exp(-xMod * c + friendliness / frDivisor));
+    }
+
+    private static double UtilityHardCraft(double crafts, double confidence)
+    {
+        double c = PerceivedSkill(crafts, confidence);
+
+        double xMod = 0.009;
+        double diff = 5;
+
+        return xMod * Math.Pow(c, 2) - diff;
+
+    }
+
+
 }

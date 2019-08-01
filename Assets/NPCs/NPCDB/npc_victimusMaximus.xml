@@ -17,14 +17,11 @@
         <charisma>30</charisma>
         <crafts>75</crafts>
         <combat>60</combat>
-    </skills>
-
-    <!-- 0 to 100 -->
-    <pseudoskills>
+      
         <wealth>10</wealth>
         <appeal>10</appeal>
         <fitness>50</fitness>
-    </pseudoskills>
+    </skills>
 
     <!-- -100 to 100 -->
     <allegiances>
@@ -36,9 +33,9 @@
             <premise>Hello, stranger. Could you hold my wallet while I untie my shoes?</premise>
             <option pointer = "q0">Oh god... Sorry I must leave</option>
         </page>
-      <page id = "q0">
-        <premise></premise>
-      </page>
+        <page id = "q0">
+          <premise></premise>
+        </page>
     </dialog>
 
 </npc>

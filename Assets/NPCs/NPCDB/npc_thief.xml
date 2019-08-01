@@ -17,28 +17,25 @@
         <charisma>30</charisma>
         <crafts>20</crafts>
         <combat>40</combat>
-    </skills>
-
-    <!-- 0 to 100 -->
-    <pseudoskills>
+      
         <wealth>10</wealth>
         <appeal>20</appeal>
         <fitness>40</fitness>
-    </pseudoskills>
+    </skills>
 
     <!-- -100 to 100 -->
     <allegiances>
-      <player>-50</player>
+        <player>-50</player>
     </allegiances>
 
-  <dialog>
-    <page id = "root">
-      <premise>Hey! What's that over there?</premise>
-      <option pointer = "q0">Keep your hands to yourself, sneak thief!</option>
-    </page>
-    <page id = "q0">
-      <premise>It's Mr. Breeki to you</premise>
-    </page>
-  </dialog>
+    <dialog>
+        <page id = "root">
+            <premise>Hey! What's that over there?</premise>
+            <option pointer = "q0">Keep your hands to yourself, sneak thief!</option>
+        </page>
+        <page id = "q0">
+            <premise>It's Mr. Breeki to you</premise>
+        </page>
+    </dialog>
 
 </npc>

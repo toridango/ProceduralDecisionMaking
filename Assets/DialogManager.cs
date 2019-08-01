@@ -178,10 +178,10 @@ public class DialogManager : MonoBehaviour
         interactTarget.GetComponent<NPC>().GetDialog().Reset();
         interactTarget = null;
 
-        playerController.GetComponent<FirstPersonController>().enabled = true;
+        /*playerController.GetComponent<FirstPersonController>().enabled = true;
 
         FirstPersonController fpc = playerController.GetComponent<FirstPersonController>();
-        fpc.SendMessage("DialogUnlock");
+        fpc.SendMessage("DialogUnlock");*/
 
 
     }
@@ -208,13 +208,20 @@ public class DialogManager : MonoBehaviour
 
             if (exitCode.StartsWith("q") || exitCode.StartsWith("a"))
             {
-                StartCoroutine(WaitSecondsAndQuitDialog(1));
+                StartCoroutine(WaitSecondsAndQuitDialog(2));
             }
         }
     }
 
     public IEnumerator WaitSecondsAndQuitDialog(int seconds)
     {
+
+        playerController.GetComponent<FirstPersonController>().enabled = true;
+
+        FirstPersonController fpc = playerController.GetComponent<FirstPersonController>();
+        fpc.SendMessage("DialogUnlock");
+
+
         Debug.Log("Exiting dialog in " + seconds.ToString() + " seconds");
         yield return new WaitForSeconds(seconds);
         QuitDialog();

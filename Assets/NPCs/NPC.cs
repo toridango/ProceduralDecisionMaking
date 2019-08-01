@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityStandardAssets.Characters.ThirdPerson;
@@ -10,15 +11,17 @@ public class NPC : MonoBehaviour
     [SerializeField] private TextAsset npcSourceFile;
     [SerializeField] private Text m_overheadTextName;
     [SerializeField] private Text m_overheadTextDescription;
-    
-    
+    [Tooltip("Public items in inventory")]
+    [SerializeField] private List<string> m_publicInventory;
+
+
     // <Properties>
 
     private string m_name;
 
     private Dictionary<string, int> m_personality;
     private Dictionary<string, int> m_skills;
-    private Dictionary<string, int> m_pseudoSkills;
+    //private Dictionary<string, int> m_pseudoSkills;
     private Dictionary<string, int> m_allegiances;
 
     private Dialog m_dialog;
@@ -26,8 +29,7 @@ public class NPC : MonoBehaviour
     private Node.Status m_treeStatus;
 
     private Dictionary<string, string> m_actionToSkill;
-    private Dictionary<string, string> m_actionToPseudoSkill;
-    private Dictionary<string, double> m_pssThreshold;
+    private Dictionary<string, double> m_skillThreshold;
 
 
 
@@ -50,7 +52,7 @@ public class NPC : MonoBehaviour
     {
         m_personality = new Dictionary<string, int>();
         m_skills = new Dictionary<string, int>();
-        m_pseudoSkills = new Dictionary<string, int>();
+        //m_pseudoSkills = new Dictionary<string, int>();
         m_allegiances = new Dictionary<string, int>();
         m_overheadMessageQ = new Queue<string>();
 
@@ -59,16 +61,20 @@ public class NPC : MonoBehaviour
             { "steal", "avg_pickpocket_stealth" },
             { "persuade", "charisma" },
             { "intimidate", "combat" },
-            { "craft", "crafts" }
+            { "craft", "crafts" },
+            { "buy", "wealth" },
+            { "bribe", "wealth" },
+            { "fight", "combat" },
+            { "assassinate", "avg_combat_stealth" },
+            { "build", "crafts" },
+            { "outsource", "wealth" }
 
         };
-        m_actionToPseudoSkill = new Dictionary<string, string>()
+
+        m_skillThreshold = new Dictionary<string, double>()
         {
-            { "buy", "wealth" }
-        };
-        m_pssThreshold = new Dictionary<string, double>()
-        {
-            { "apple", 1.0 } // number in terms of wealth
+            { "apple", 1.0 }, // number in terms of wealth
+            { "sword", 35.0 } // number in terms of craftsmanship
         };
 
         LoadFromXmlTextAsset();
@@ -171,112 +177,145 @@ public class NPC : MonoBehaviour
             {
                 // Get Item
                 case "gi":
-                {
-                    // evaluate "Find" course of action with Scene information before scoring the rest
-
-                    // Evaluate courses of action
-                    List<System.Tuple<string, double>> uS = UtilityScoring.ScoreGetItem(m_personality, m_skills, m_pseudoSkills, -1.0);
-
-                    m_treeRoot = MakeTree(uS);
-                
-                    /*string msg = "Sorted scores: ";
-
-                    for(int i = 0; i < uS.Count; ++i)
                     {
-                        if (uS[i].Item2 > 0)
-                        {
-                            if (i > 0)
-                                msg += ", ";
-                            
-                            msg += uS[i].Item1 + " (" + Math.Round(uS[i].Item2).ToString() + ")";
+                        string targetItem = codeSlices[2];
+                        bool craftable = CheckCraftable(targetItem);
+                        double utilityFind = CheckFind(targetItem);
+                        List<System.Tuple<string, double>> uS = UtilityScoring.ScoreGetItem(m_personality, 
+                                                                                            m_skills, 
+                                                                                            utilityFind,
+                                                                                            craftable);
+                        m_treeRoot = MakeTree(uS, targetItem);
+                
 
-                        }
+                        // NPC announcement
+                        /*string msg = "I will try ";
+
+                        if (uS[0].Item1.EndsWith("e"))
+                            msg += uS[0].Item1.Substring(0, uS[0].Item1.Length - 1) + "ing";
+                        else
+                            msg += uS[0] + "ing";
+
+                        PushOverheadMessage(msg + " first");*/
+                        break;
                     }
-                    Debug.Log(msg);*/
-                    string msg = "I will try ";
+                // Convince
+                case "co":
+                    {
+                        string targetName = "NPC_"+codeSlices[2];
+                        List<System.Tuple<string, double>> uS = UtilityScoring.ScoreConvince(m_personality,
+                                                                                            m_skills);
+                        m_treeRoot = MakeTree(uS, targetName);
 
-                    if (uS[0].Item1.EndsWith("e"))
-                        msg += uS[0].Item1.Substring(0, uS[0].Item1.Length - 1) + "ing";
-                    else
-                        msg += uS[0] + "ing";
+                        break;
+                    }
+                // Neutralize
+                case "nu":
+                    {
+                        string targetName = "NPC_"+codeSlices[2];
+                        double allegianceToTarget = 0;
+                        if (m_allegiances.ContainsKey(targetName))
+                        {
+                            allegianceToTarget = m_allegiances[targetName];
+                        }
+                        else
+                        {
+                            m_allegiances[targetName] = 0;
+                        }
 
-                    PushOverheadMessage(msg + " first");
-
-
-                    //string skillUse = "pickpocket";
-                    //string target = "NPC_VictimusMaximus";
-                    ////Debug.Log(m_pseudoSkills["wealth"]);
-                    //if (m_pseudoSkills["wealth"] < 75)
-                    //{
-                    //    skillUse = "pay";
-                    //    target = "NPC_Belethor";
-                    //}
-                    //GetItem(target, skillUse);
-                    break;
-                }
+                        List<System.Tuple<string, double>> uS = UtilityScoring.ScoreNeutralize(m_personality,
+                                                                                            m_skills,
+                                                                                            allegianceToTarget);
+                        m_treeRoot = MakeTree(uS, targetName);
+                        break;
+                    }
+                // Develop
+                case "dv":
+                    {
+                        string target = codeSlices[2];
+                        List<System.Tuple<string, double>> uS = UtilityScoring.ScoreDevelop(m_personality,
+                                                                                            m_skills);
+                        m_treeRoot = MakeTree(uS, target);
+                        break;
+                    }
                 default:
                     break;
             }
     }
 
-
-    private Node MakeTree(List<System.Tuple<string, double>> uScores)
+    // TODO specify for the rest of goals that are not move + versus
+    private Node MakeTree(List<System.Tuple<string, double>> uScores, string target)
     {
         List<Node> actions = new List<Node>();
+        string msg = "| ";
 
         foreach (System.Tuple<string, double> t in uScores)
         {
-            //Debug.Log(t.Item1 +": " + t.Item2.ToString());
 
             // utility over zero
             if (t.Item2 > 0.0)
             {
+                //Debug.Log(t.Item1 +": " + t.Item2.ToString());
+                msg += t.Item1 + ": " + t.Item2.ToString() + " | ";
 
                 Node action;
-                string targ = "NPC_Belethor";
                 if (t.Item1.Equals("craft"))
                 {
-                    VersusActionNode.VersusActionDelegate check = new VersusActionNode.VersusActionDelegate(CheckSkill);
-                    NPC vs = GameObject.Find(targ).GetComponent<NPC>();
-                    VersusActionNode checkNode = new VersusActionNode(check, t.Item1, vs);
-                    action = checkNode;
+                    ThresholdActionNode.ThresholdActionDelegate check = new ThresholdActionNode.ThresholdActionDelegate(CheckSkillThreshold);
                     
+                    ThresholdActionNode checkNode = new ThresholdActionNode(check, t.Item1, target);
+                    //action = checkNode;
+                    actions.Add(checkNode);
+
                 }
                 else if (t.Item1.Equals("find"))
                 {
                     ActionNode.ActionDelegate move = new ActionNode.ActionDelegate(MoveToTarget);
-                    ActionNode moveNode = new ActionNode(move, targ);
-                    action = moveNode;
-                    
-                }
-                else if (t.Item1.Equals("buy"))
-                {
-                    ActionNode.ActionDelegate move = new ActionNode.ActionDelegate(MoveToTarget);
-                    ActionNode moveNode = new ActionNode(move, targ);
+                    ActionNode moveNode = new ActionNode(move, target);
+                    //action = moveNode;
+                    actions.Add(moveNode);
 
-                    ThresholdActionNode.ThresholdActionDelegate check = new ThresholdActionNode.ThresholdActionDelegate(CheckPseudoSkill);
-                    
-                    ThresholdActionNode thNode = new ThresholdActionNode(check, t.Item1, "apple");
-                    Sequence moveandCheck = new Sequence(new List<Node>() { moveNode, thNode });
-                    action = moveandCheck;
                 }
                 else
                 {
-                    ActionNode.ActionDelegate move = new ActionNode.ActionDelegate(MoveToTarget);
-                    ActionNode moveNode = new ActionNode(move, targ);
+                    List<GameObject> npcs = FindNPCsWith(target);
+                    if(npcs.Count > 0)
+                    {
+                        if (t.Item1.Equals("buy"))
+                        {
 
-                    VersusActionNode.VersusActionDelegate check = new VersusActionNode.VersusActionDelegate(CheckSkill);
-                    NPC vs = GameObject.Find(targ).GetComponent<NPC>();
-                    VersusActionNode checkNode = new VersusActionNode(check, t.Item1, vs);
-                    Sequence moveandCheck = new Sequence(new List<Node>() { moveNode, checkNode });
-                    action = moveandCheck;
-                    
+                            string npc = npcs[0].name;
+                            ActionNode.ActionDelegate move = new ActionNode.ActionDelegate(MoveToTarget);
+                            ActionNode moveNode = new ActionNode(move, npc);
+
+                            ThresholdActionNode.ThresholdActionDelegate check = new ThresholdActionNode.ThresholdActionDelegate(CheckSkillThreshold);
+
+                            ThresholdActionNode thNode = new ThresholdActionNode(check, t.Item1, target);
+                            Sequence moveandCheck = new Sequence(new List<Node>() { moveNode, thNode });
+                            action = moveandCheck;
+                            actions.Add(action);
+                        }
+                        else
+                        {
+                            string npc = npcs[0].name;
+                            ActionNode.ActionDelegate move = new ActionNode.ActionDelegate(MoveToTarget);
+                            ActionNode moveNode = new ActionNode(move, npc);
+
+                            VersusActionNode.VersusActionDelegate check = new VersusActionNode.VersusActionDelegate(CheckSkillVersus);
+                            NPC vs = GameObject.Find(npc).GetComponent<NPC>();
+                            VersusActionNode checkNode = new VersusActionNode(check, t.Item1, vs);
+                            Sequence moveandCheck = new Sequence(new List<Node>() { moveNode, checkNode });
+                            action = moveandCheck;
+                            actions.Add(action);
+
+                        }
+                    }
                 }
-                actions.Add(action);
             }
         }
         Selector selector = new Selector(actions);
 
+        Debug.Log(msg);
         return selector;
     }
     
@@ -297,7 +336,7 @@ public class NPC : MonoBehaviour
         return Node.Status.RUNNING;
     }
 
-    private Node.Status CheckSkill(string a, NPC npc)
+    private Node.Status CheckSkillVersus(string a, NPC npc)
     {
         Debug.Log("Checking " + a + " vs " + npc.name);
 
@@ -332,20 +371,98 @@ public class NPC : MonoBehaviour
             return Node.Status.FAILED;
     }
 
-    private Node.Status CheckPseudoSkill(string s, string targ)
+    private Node.Status CheckSkillThreshold(string s, string targ)
     {
-        string ps = m_actionToPseudoSkill[s];
+        string ps = m_actionToSkill[s];
         Debug.Log("Checking " + ps + " for " + targ);
 
-        double threshold = m_pssThreshold[targ];
+        double threshold = m_skillThreshold[targ];
+        double skill = 0.0;
+        
+        skill = (double)m_skills[ps];
 
-        if ((double)m_pseudoSkills[ps] >= threshold)
+        if (skill >= threshold)
             return Node.Status.SUCCEEDED;
         else
             return Node.Status.FAILED;
     }
 
-    private void GetItem(string target, string skillUse)
+    private bool CheckCraftable(string itemName)
+    {
+        switch(itemName)
+        {
+            case "sword":
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private double UtilityFind(GameObject go)
+    {
+        double dist = Vector2.Distance(this.transform.position, go.transform.position);
+        return 1000.0 / (0.005 * dist + 10);
+    }
+
+    private double CheckFind(string itemName)
+    {
+        // utility depending on distance
+        double utility = -1.0;
+        List<GameObject> findables = new List<GameObject>();
+        foreach (GameObject go in GameObject.FindGameObjectsWithTag("Findable"))
+        {
+            if (go.name.StartsWith(itemName))
+                findables.Add(go);
+        }
+
+        if(findables.Count > 0)
+        {
+            findables = findables.OrderBy(
+                                    x => Vector2.Distance(this.transform.position, x.transform.position)
+                                    ).ToList();
+
+            utility = UtilityFind(findables[0]);
+        }
+        return utility;
+    }
+
+    public bool CheckHasItem(string itemName)
+    {
+        bool hasIt = false;
+        foreach(string s in m_publicInventory)
+        {
+            if (s.Equals(itemName))
+                hasIt = true;
+        }
+
+        return hasIt;
+    }
+
+
+    // Checks Inventories for target
+    // Returns sorted list
+    private List<GameObject> FindNPCsWith(string target)
+    {
+        List<GameObject> npcs = new List<GameObject>();
+        foreach (GameObject go in GameObject.FindGameObjectsWithTag("NPC"))
+        {
+            if (go.name.Contains(target))
+                npcs.Add(go);
+            else if (go.GetComponent<NPC>().CheckHasItem(target))
+                npcs.Add(go);
+        }
+
+        if (npcs.Count > 0)
+        {
+            npcs = npcs.OrderBy(
+                                x => Vector2.Distance(this.transform.position, x.transform.position)
+                                ).ToList();
+        }
+        return npcs;
+    }
+
+
+    /*private void GetItem(string target, string skillUse)
     {
 
         switch(skillUse)
@@ -366,7 +483,7 @@ public class NPC : MonoBehaviour
                 break;
         }
 
-    }
+    }*/
 
     private Vector3 GetDestinationForString(string go)
     {
@@ -395,10 +512,10 @@ public class NPC : MonoBehaviour
         return m_skills[s];
     }
 
-    public int GetPseudoSkill(string s)
+    /*public int GetPseudoSkill(string s)
     {
         return m_pseudoSkills[s];
-    }
+    }*/
 
 
     // Read XML and set properties
@@ -436,7 +553,7 @@ public class NPC : MonoBehaviour
                         }                        
                         break;
                     }
-                    case "pseudoskills":
+                    /*case "pseudoskills":
                     {
                         foreach (XmlNode grandchild in child)
                         {
@@ -444,7 +561,7 @@ public class NPC : MonoBehaviour
                             m_pseudoSkills.Add(grandchild.Name, int.Parse(grandchild.InnerText));
                         }
                         break;
-                    }
+                    }*/
                     case "allegiances":
                     {
                         foreach (XmlNode grandchild in child)

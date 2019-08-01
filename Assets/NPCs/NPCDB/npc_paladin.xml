@@ -17,28 +17,25 @@
         <charisma>50</charisma>
         <crafts>20</crafts>
         <combat>80</combat>
-    </skills>
-
-    <!-- 0 to 100 -->
-    <pseudoskills>
+      
         <wealth>40</wealth>
         <appeal>30</appeal>
         <fitness>70</fitness>
-    </pseudoskills>
+    </skills>
 
     <!-- -100 to 100 -->
     <allegiances>
-      <player>100</player>
+        <player>100</player>
     </allegiances>
 
-  <dialog>
-    <page id = "root">
-      <premise>Hello, stranger.</premise>
-      <option pointer = "q0">I can't think of anything to say</option>
-    </page>
-    <page id = "q0">
-      <premise>Farewell</premise>
-    </page>
-  </dialog>
+    <dialog>
+        <page id = "root">
+          <premise>Hello, stranger.</premise>
+          <option pointer = "q0">I can't think of anything to say</option>
+        </page>
+        <page id = "q0">
+          <premise>Farewell</premise>
+        </page>
+    </dialog>
 
 </npc>
