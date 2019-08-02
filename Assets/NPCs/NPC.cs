@@ -65,7 +65,7 @@ public class NPC : MonoBehaviour
             { "buy", "wealth" },
             { "bribe", "wealth" },
             { "fight", "combat" },
-            { "assassinate", "avg_combat_stealth" },
+            { "assassinate", "stealth" },
             { "build", "crafts" },
             { "outsource", "wealth" }
 
@@ -74,7 +74,8 @@ public class NPC : MonoBehaviour
         m_skillThreshold = new Dictionary<string, double>()
         {
             { "apple", 1.0 }, // number in terms of wealth
-            { "sword", 35.0 } // number in terms of craftsmanship
+            { "sword", 35.0 }, // number in terms of craftsmanship
+            { "enchant", 80.0 }
         };
 
         LoadFromXmlTextAsset();
@@ -169,6 +170,8 @@ public class NPC : MonoBehaviour
     {
         char separator = '_';
         string[] codeSlices = code.Split(separator);
+        float i_time = Time.realtimeSinceStartup;
+
         //foreach (string s in codeSlices)
         //    Debug.Log(s);
 
@@ -181,12 +184,18 @@ public class NPC : MonoBehaviour
                         string targetItem = codeSlices[2];
                         bool craftable = CheckCraftable(targetItem);
                         double utilityFind = CheckFind(targetItem);
+                        float t0 = Time.realtimeSinceStartup;
+
                         List<System.Tuple<string, double>> uS = UtilityScoring.ScoreGetItem(m_personality, 
                                                                                             m_skills, 
                                                                                             utilityFind,
                                                                                             craftable);
+                        Debug.Log("\tScoring time:" + (Time.realtimeSinceStartup - t0).ToString());
+
+                        t0 = Time.realtimeSinceStartup;
                         m_treeRoot = MakeTree(uS, targetItem);
-                
+                        Debug.Log("\tMake Tree time:" + (Time.realtimeSinceStartup - t0).ToString());
+
 
                         // NPC announcement
                         /*string msg = "I will try ";
@@ -203,9 +212,15 @@ public class NPC : MonoBehaviour
                 case "co":
                     {
                         string targetName = "NPC_"+codeSlices[2];
+                        float t0 = Time.realtimeSinceStartup;
+
                         List<System.Tuple<string, double>> uS = UtilityScoring.ScoreConvince(m_personality,
                                                                                             m_skills);
+                        Debug.Log("\tScoring time:" + (Time.realtimeSinceStartup - t0).ToString());
+
+
                         m_treeRoot = MakeTree(uS, targetName);
+                        Debug.Log("\tMake Tree time:" + (Time.realtimeSinceStartup - t0).ToString());
 
                         break;
                     }
@@ -214,6 +229,8 @@ public class NPC : MonoBehaviour
                     {
                         string targetName = "NPC_"+codeSlices[2];
                         double allegianceToTarget = 0;
+                        float t0 = Time.realtimeSinceStartup;
+
                         if (m_allegiances.ContainsKey(targetName))
                         {
                             allegianceToTarget = m_allegiances[targetName];
@@ -226,21 +243,33 @@ public class NPC : MonoBehaviour
                         List<System.Tuple<string, double>> uS = UtilityScoring.ScoreNeutralize(m_personality,
                                                                                             m_skills,
                                                                                             allegianceToTarget);
+                        Debug.Log("\tScoring time:" + (Time.realtimeSinceStartup - t0).ToString());
+
                         m_treeRoot = MakeTree(uS, targetName);
+                        Debug.Log("\tMake Tree time:" + (Time.realtimeSinceStartup - t0).ToString());
+
                         break;
                     }
                 // Develop
                 case "dv":
                     {
                         string target = codeSlices[2];
+                        float t0 = Time.realtimeSinceStartup;
+
                         List<System.Tuple<string, double>> uS = UtilityScoring.ScoreDevelop(m_personality,
                                                                                             m_skills);
+                        Debug.Log("\tScoring time:" + (Time.realtimeSinceStartup - t0).ToString());
+
                         m_treeRoot = MakeTree(uS, target);
+                        Debug.Log("\tMake Tree time:" + (Time.realtimeSinceStartup - t0).ToString());
+
                         break;
                     }
                 default:
                     break;
             }
+
+        Debug.Log("\tTOTAL PREPROCESS TIME: " + (Time.realtimeSinceStartup - i_time).ToString());
     }
 
     // TODO specify for the rest of goals that are not move + versus
@@ -259,7 +288,8 @@ public class NPC : MonoBehaviour
                 msg += t.Item1 + ": " + t.Item2.ToString() + " | ";
 
                 Node action;
-                if (t.Item1.Equals("craft"))
+                // THRESHOLD NODE, NO MOVE
+                if (t.Item1.Equals("craft") || t.Item1.Equals("build"))
                 {
                     ThresholdActionNode.ThresholdActionDelegate check = new ThresholdActionNode.ThresholdActionDelegate(CheckSkillThreshold);
                     
@@ -268,6 +298,7 @@ public class NPC : MonoBehaviour
                     actions.Add(checkNode);
 
                 }
+                // ONLY MOVE
                 else if (t.Item1.Equals("find"))
                 {
                     ActionNode.ActionDelegate move = new ActionNode.ActionDelegate(MoveToTarget);
@@ -281,7 +312,8 @@ public class NPC : MonoBehaviour
                     List<GameObject> npcs = FindNPCsWith(target);
                     if(npcs.Count > 0)
                     {
-                        if (t.Item1.Equals("buy"))
+                        // MOVE THEN THRESHOLD NODE
+                        if (t.Item1.Equals("buy") || t.Item1.Equals("outsource"))
                         {
 
                             string npc = npcs[0].name;
@@ -295,6 +327,8 @@ public class NPC : MonoBehaviour
                             action = moveandCheck;
                             actions.Add(action);
                         }
+                        // MOVE THEN VERSUS NODE
+                        // steal, persuade, intimidate, bribe, fight, assassinate
                         else
                         {
                             string npc = npcs[0].name;
@@ -323,6 +357,9 @@ public class NPC : MonoBehaviour
     private Node.Status MoveToTarget(string s)
     {
         GameObject go = GameObject.Find(s);
+        if (go == null)
+            return Node.Status.FAILED;
+
         GetComponent<AICharacterControl>().SetDestination(GetDestinationForGO(go), false);
 
         float remainingDist = (go.transform.position - transform.position).magnitude;
