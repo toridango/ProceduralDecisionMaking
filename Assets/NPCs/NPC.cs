@@ -13,6 +13,8 @@ public class NPC : MonoBehaviour
     [SerializeField] private Text m_overheadTextDescription;
     [Tooltip("Public items in inventory")]
     [SerializeField] private List<string> m_publicInventory;
+    [SerializeField] private bool m_verbose;
+    [SerializeField] private bool m_logTimes;
 
 
     // <Properties>
@@ -117,7 +119,7 @@ public class NPC : MonoBehaviour
                 else if (m_treeStatus == Node.Status.CANCELLED)
                     msg = "Objective Cancelled";
 
-                Debug.Log(msg);
+                if (m_verbose) Debug.Log(msg);
                 m_treeRoot = null;
             }
         }
@@ -190,11 +192,11 @@ public class NPC : MonoBehaviour
                                                                                             m_skills, 
                                                                                             utilityFind,
                                                                                             craftable);
-                        Debug.Log("\tScoring time:" + (Time.realtimeSinceStartup - t0).ToString());
+                        if (m_logTimes) Debug.Log("\tScoring time:" + (Time.realtimeSinceStartup - t0).ToString());
 
                         t0 = Time.realtimeSinceStartup;
                         m_treeRoot = MakeTree(uS, targetItem);
-                        Debug.Log("\tMake Tree time:" + (Time.realtimeSinceStartup - t0).ToString());
+                        if (m_logTimes) Debug.Log("\tMake Tree time:" + (Time.realtimeSinceStartup - t0).ToString());
 
 
                         // NPC announcement
@@ -216,11 +218,12 @@ public class NPC : MonoBehaviour
 
                         List<System.Tuple<string, double>> uS = UtilityScoring.ScoreConvince(m_personality,
                                                                                             m_skills);
-                        Debug.Log("\tScoring time:" + (Time.realtimeSinceStartup - t0).ToString());
+                        if (m_logTimes) Debug.Log("\tScoring time:" + (Time.realtimeSinceStartup - t0).ToString());
 
 
+                        t0 = Time.realtimeSinceStartup;
                         m_treeRoot = MakeTree(uS, targetName);
-                        Debug.Log("\tMake Tree time:" + (Time.realtimeSinceStartup - t0).ToString());
+                        if (m_logTimes) Debug.Log("\tMake Tree time:" + (Time.realtimeSinceStartup - t0).ToString());
 
                         break;
                     }
@@ -243,10 +246,11 @@ public class NPC : MonoBehaviour
                         List<System.Tuple<string, double>> uS = UtilityScoring.ScoreNeutralize(m_personality,
                                                                                             m_skills,
                                                                                             allegianceToTarget);
-                        Debug.Log("\tScoring time:" + (Time.realtimeSinceStartup - t0).ToString());
+                        if (m_logTimes) Debug.Log("\tScoring time:" + (Time.realtimeSinceStartup - t0).ToString());
 
+                        t0 = Time.realtimeSinceStartup;
                         m_treeRoot = MakeTree(uS, targetName);
-                        Debug.Log("\tMake Tree time:" + (Time.realtimeSinceStartup - t0).ToString());
+                        if (m_logTimes) Debug.Log("\tMake Tree time:" + (Time.realtimeSinceStartup - t0).ToString());
 
                         break;
                     }
@@ -258,10 +262,11 @@ public class NPC : MonoBehaviour
 
                         List<System.Tuple<string, double>> uS = UtilityScoring.ScoreDevelop(m_personality,
                                                                                             m_skills);
-                        Debug.Log("\tScoring time:" + (Time.realtimeSinceStartup - t0).ToString());
+                        if (m_logTimes) Debug.Log("\tScoring time:" + (Time.realtimeSinceStartup - t0).ToString());
 
+                        t0 = Time.realtimeSinceStartup;
                         m_treeRoot = MakeTree(uS, target);
-                        Debug.Log("\tMake Tree time:" + (Time.realtimeSinceStartup - t0).ToString());
+                        if (m_logTimes) Debug.Log("\tMake Tree time:" + (Time.realtimeSinceStartup - t0).ToString());
 
                         break;
                     }
@@ -269,7 +274,7 @@ public class NPC : MonoBehaviour
                     break;
             }
 
-        Debug.Log("\tTOTAL PREPROCESS TIME: " + (Time.realtimeSinceStartup - i_time).ToString());
+        if (m_logTimes) Debug.Log("\tTOTAL PREPROCESS TIME: " + (Time.realtimeSinceStartup - i_time).ToString());
     }
 
     // TODO specify for the rest of goals that are not move + versus
@@ -349,7 +354,7 @@ public class NPC : MonoBehaviour
         }
         Selector selector = new Selector(actions);
 
-        Debug.Log(msg);
+        if (m_verbose) Debug.Log(msg);
         return selector;
     }
     
@@ -364,7 +369,7 @@ public class NPC : MonoBehaviour
 
         float remainingDist = (go.transform.position - transform.position).magnitude;
 
-        Debug.Log("Moving to " + go.name);
+        if(m_verbose) Debug.Log("Moving to " + go.name);
 
         if(remainingDist < 2.0f)
         {
@@ -375,7 +380,7 @@ public class NPC : MonoBehaviour
 
     private Node.Status CheckSkillVersus(string a, NPC npc)
     {
-        Debug.Log("Checking " + a + " vs " + npc.name);
+        if (m_verbose) Debug.Log("Checking " + a + " vs " + npc.name);
 
         double myScore = 0.0;
         double theirScore = 0.0;
@@ -411,7 +416,7 @@ public class NPC : MonoBehaviour
     private Node.Status CheckSkillThreshold(string s, string targ)
     {
         string ps = m_actionToSkill[s];
-        Debug.Log("Checking " + ps + " for " + targ);
+        if (m_verbose) Debug.Log("Checking " + ps + " for " + targ);
 
         double threshold = m_skillThreshold[targ];
         double skill = 0.0;

@@ -6,7 +6,7 @@
         <caution>20</caution>
         <carelessness>20</carelessness>
         <conscience>-20</conscience>
-        <friendliness>10</friendliness>
+        <friendliness>-30</friendliness>
         <confidence>30</confidence>
     </personality>
 
@@ -26,12 +26,26 @@
     <!-- -100 to 100 -->
     <allegiances>
         <player>-50</player>
+      <npc_sneekibreeki>-95</npc_sneekibreeki>
     </allegiances>
 
     <dialog>
         <page id = "root">
-            <premise>Hey! What's that over there?</premise>
-            <option pointer = "q0">Keep your hands to yourself, sneak thief!</option>
+          <premise>Hey! What's that over there?</premise>
+          <option pointer = "1">*try to bend his mind to your will*</option>
+          <option pointer = "q0">Keep your hands to yourself, sneak thief!</option>
+        </page>
+        <page id = "1">
+          <premise>...</premise>
+          <option pointer = "a_gi_apple">[Mind Trick] "Get me an apple"</option>
+          <option pointer = "a_nu_PaladinCork">[Mind Trick] "Neutralize Paladin Cork"</option>
+          <option pointer = "q0">I can't talk more right now</option>
+        </page>
+        <page id = "a_gi_apple">
+          <premise>Will do</premise>
+        </page>
+        <page id = "a_nu_PaladinCork">
+          <premise>Will do</premise>
         </page>
         <page id = "q0">
             <premise>It's Mr. Breeki to you</premise>

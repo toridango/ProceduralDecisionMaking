@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<npc name = "E-Ball-Uator">
+  <!-- -100 to 100 -->
+  <personality>
+    <caution>0</caution>
+    <carelessness>0</carelessness>
+    <conscience>0</conscience>
+    <friendliness>0</friendliness>
+    <confidence>0</confidence>
+  </personality>
+
+  <!-- 0 to 100 -->
+  <skills>
+    <pickpocket>0</pickpocket>
+    <stealth>0</stealth>
+    <charisma>0</charisma>
+    <crafts>0</crafts>
+    <combat>0</combat>
+
+    <wealth>0</wealth>
+    <appeal>0</appeal>
+    <fitness>0</fitness>
+  </skills>
+
+  <!-- -100 to 100 -->
+  <allegiances>
+    <player>100</player>
+  </allegiances>
+
+  <dialog>
+    <page id = "root">
+      <premise>Choose command</premise>
+      <option pointer = "q1">*Evaluate procedural courses of action agaisnt human-written baselines*</option>
+      <option pointer = "q0">Quit</option>
+    </page>
+    <page id = "q1">
+      <premise>Running comparisons...</premise>
+    </page>
+    <page id = "q0">
+      <premise>Bye</premise>
+    </page>
+  </dialog>
+
+</npc>

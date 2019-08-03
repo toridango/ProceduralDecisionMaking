@@ -26,12 +26,22 @@
     <!-- -100 to 100 -->
     <allegiances>
         <player>100</player>
+        <npc_sneekibreeki>-75</npc_sneekibreeki>
     </allegiances>
 
     <dialog>
         <page id = "root">
           <premise>Hello, stranger.</premise>
+          <option pointer = "1">*try to bend his mind to your will*</option>
           <option pointer = "q0">I can't think of anything to say</option>
+        </page>
+        <page id = "1">
+          <premise>...</premise>
+          <option pointer = "a_nu_SneekiBreeki">[Mind Trick] "Neutralize Mr. Breeki"</option>
+          <option pointer = "q0">I can't talk more right now</option>
+        </page>
+        <page id = "a_nu_SneekiBreeki">
+          <premise>Will do</premise>
         </page>
         <page id = "q0">
           <premise>Farewell</premise>

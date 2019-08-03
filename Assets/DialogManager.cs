@@ -222,7 +222,7 @@ public class DialogManager : MonoBehaviour
         fpc.SendMessage("DialogUnlock");
 
 
-        Debug.Log("Exiting dialog in " + seconds.ToString() + " seconds");
+        //Debug.Log("Exiting dialog in " + seconds.ToString() + " seconds");
         yield return new WaitForSeconds(seconds);
         QuitDialog();
 
