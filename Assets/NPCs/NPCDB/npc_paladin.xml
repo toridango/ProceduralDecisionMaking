@@ -32,6 +32,7 @@
     <dialog>
         <page id = "root">
           <premise>Hello, stranger.</premise>
+          <option pointer = "r_nu_SneekiBreeki">Could you please get Mr. Sneeki out of this town?</option>
           <option pointer = "1">*try to bend his mind to your will*</option>
           <option pointer = "q0">I can't think of anything to say</option>
         </page>
@@ -42,6 +43,9 @@
         </page>
         <page id = "a_nu_SneekiBreeki">
           <premise>Will do</premise>
+        </page>
+        <page id = "qn">
+          <premise>No way</premise>
         </page>
         <page id = "q0">
           <premise>Farewell</premise>

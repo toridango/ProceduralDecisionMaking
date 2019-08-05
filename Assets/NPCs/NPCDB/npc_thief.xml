@@ -26,12 +26,13 @@
     <!-- -100 to 100 -->
     <allegiances>
         <player>-50</player>
-      <npc_sneekibreeki>-95</npc_sneekibreeki>
+        <npc_paladincork>-95</npc_paladincork>
     </allegiances>
 
     <dialog>
         <page id = "root">
           <premise>Hey! What's that over there?</premise>
+          <option pointer = "r_nu_PaladinCork">I need you to neutralize Paladin Cork</option>
           <option pointer = "1">*try to bend his mind to your will*</option>
           <option pointer = "q0">Keep your hands to yourself, sneak thief!</option>
         </page>
@@ -49,6 +50,9 @@
         </page>
         <page id = "q0">
             <premise>It's Mr. Breeki to you</premise>
+        </page>
+        <page id = "qn">
+          <premise>Get out of my sight</premise>
         </page>
     </dialog>
 

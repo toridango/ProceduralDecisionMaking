@@ -31,10 +31,10 @@
   <dialog>
     <page id = "root">
       <premise>Choose command</premise>
-      <option pointer = "q1">*Evaluate procedural courses of action agaisnt human-written baselines*</option>
+      <option pointer = "t0">*Evaluate procedural courses of action agaisnt human-written baselines*</option>
       <option pointer = "q0">Quit</option>
     </page>
-    <page id = "q1">
+    <page id = "t0">
       <premise>Running comparisons...</premise>
     </page>
     <page id = "q0">

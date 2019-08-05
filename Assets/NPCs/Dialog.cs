@@ -32,8 +32,13 @@ public class Dialog
     {
         string exitCode = "";
         exitCode = m_currentPage.GetPointer(choice);
-        m_currentPage = m_pageDict[exitCode];
+        //m_currentPage = m_pageDict[exitCode];
         return exitCode;
+    }
+
+    public void NextPage(string code)
+    {
+        m_currentPage = m_pageDict[code];
     }
 
     public Page GetCurrentPage()

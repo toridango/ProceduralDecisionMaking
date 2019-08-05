@@ -34,6 +34,9 @@ public class NPC : MonoBehaviour
     private Dictionary<string, double> m_skillThreshold;
 
 
+    private System.Random rand;
+
+
 
     // <\Properties>
 
@@ -57,6 +60,14 @@ public class NPC : MonoBehaviour
         //m_pseudoSkills = new Dictionary<string, int>();
         m_allegiances = new Dictionary<string, int>();
         m_overheadMessageQ = new Queue<string>();
+
+        rand = new System.Random(Guid.NewGuid().GetHashCode());
+        /*int c = 0;
+        for (int i = 0; i<10000; i++)
+        {
+            c += rand.Next(100);
+        }
+        Debug.Log(c / 10000);*/
 
         m_actionToSkill = new Dictionary<string, string>()
         {
@@ -131,11 +142,31 @@ public class NPC : MonoBehaviour
     {
         string exitCode = "";
         exitCode = m_dialog.MakeChoice(choice);
-        if (exitCode.StartsWith("a"))
+        string pageCode = exitCode;
+        if (exitCode.StartsWith("a")) // Action
         {
+            pageCode = exitCode;
             PreProcessAction(exitCode);
         }
-        return exitCode;
+        else if (exitCode.StartsWith("r")) // Request
+        {
+            if (AgreeToRequest()) // if agrees to the request
+            {
+                pageCode = "a" + exitCode.Substring(1);
+                Debug.Log(pageCode);
+                PreProcessAction(pageCode);
+            }
+            else
+            {
+                pageCode = "qn";
+            }
+        }
+        else if (exitCode.StartsWith("t")) // Tests
+        {
+            // TODO Test Suite here
+        }
+        m_dialog.NextPage(pageCode);
+        return pageCode;
     }
 
     public Dialog GetDialog()
@@ -558,6 +589,31 @@ public class NPC : MonoBehaviour
     {
         return m_pseudoSkills[s];
     }*/
+
+    private bool AgreeToRequest()
+    {
+        double fr = m_personality["friendliness"];
+        double ca = m_personality["caution"];
+        double factor = (fr - ca) / 10;
+        double allegiance;
+        if (m_allegiances.ContainsKey("player"))
+            allegiance = m_allegiances["player"];
+        else
+            allegiance = 0.0;
+
+        double xMod = 0.01;
+
+
+        if (allegiance > 50 - factor)
+        {
+            //Debug.Log("Agree if random under: " + (factor + xMod * allegiance * allegiance).ToString());
+            return rand.Next(100) < (factor + xMod * allegiance * allegiance);
+        }
+        else
+            return false;
+    }
+
+
 
 
     // Read XML and set properties
