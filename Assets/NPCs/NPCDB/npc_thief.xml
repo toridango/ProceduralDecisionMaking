@@ -39,10 +39,14 @@
         <page id = "1">
           <premise>...</premise>
           <option pointer = "a_gi_apple">[Mind Trick] "Get me an apple"</option>
+          <option pointer = "a_gi_sword">[Mind Trick] "Get me a sword"</option>
           <option pointer = "a_nu_PaladinCork">[Mind Trick] "Neutralize Paladin Cork"</option>
           <option pointer = "q0">I can't talk more right now</option>
         </page>
         <page id = "a_gi_apple">
+          <premise>Will do</premise>
+        </page>
+        <page id = "a_gi_sword">
           <premise>Will do</premise>
         </page>
         <page id = "a_nu_PaladinCork">

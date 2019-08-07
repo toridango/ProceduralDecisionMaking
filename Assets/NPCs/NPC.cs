@@ -43,11 +43,11 @@ public class NPC : MonoBehaviour
 
     // Dialog Data Structures
 
-    // TODO Overhead message queue
+
     private Queue<string> m_overheadMessageQ;
     private string m_currOverheadMessage;
 
-    // TODO Overhead message timer
+
     private float m_overheadMessageTimestamp;
 
 
@@ -87,8 +87,11 @@ public class NPC : MonoBehaviour
         m_skillThreshold = new Dictionary<string, double>()
         {
             { "apple", 1.0 }, // number in terms of wealth
-            { "sword", 35.0 }, // number in terms of craftsmanship
-            { "enchant", 80.0 }
+            { "sword", 35.0 }, // number in terms of craftsmanship,
+            { "wizardstaff", 90.0 },
+            { "enchant", 70.0 },
+            { "house", 98.0 },
+            { "nails", 5.0 },
         };
 
         LoadFromXmlTextAsset();
@@ -163,7 +166,8 @@ public class NPC : MonoBehaviour
         }
         else if (exitCode.StartsWith("t")) // Tests
         {
-            // TODO Test Suite here
+            BehaviourAnalytics.InitialiseAnalytics();
+            BehaviourAnalytics.Evaluate();
         }
         m_dialog.NextPage(pageCode);
         return pageCode;
@@ -308,7 +312,7 @@ public class NPC : MonoBehaviour
         if (m_logTimes) Debug.Log("\tTOTAL PREPROCESS TIME: " + (Time.realtimeSinceStartup - i_time).ToString());
     }
 
-    // TODO specify for the rest of goals that are not move + versus
+
     private Node MakeTree(List<System.Tuple<string, double>> uScores, string target)
     {
         List<Node> actions = new List<Node>();
