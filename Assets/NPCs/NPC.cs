@@ -166,8 +166,7 @@ public class NPC : MonoBehaviour
         }
         else if (exitCode.StartsWith("t")) // Tests
         {
-            BehaviourAnalytics.InitialiseAnalytics();
-            BehaviourAnalytics.Evaluate();
+            BehaviourAnalytics.PerformAnalytics();
         }
         m_dialog.NextPage(pageCode);
         return pageCode;

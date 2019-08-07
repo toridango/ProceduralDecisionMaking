@@ -1,6 +1,7 @@
 ﻿
 using System.Collections.Generic;
 using System;
+using System.IO;
 
 public class BehaviourAnalytics
 {
@@ -8,7 +9,7 @@ public class BehaviourAnalytics
     {
     }
 
-    public static void InitialiseAnalytics()
+    public static void PerformAnalytics()
     {
         // simulated NPCs       
         //Dictionary<string, int> m_personality;
@@ -23,8 +24,8 @@ public class BehaviourAnalytics
 
         List<string> goals = new List<string>()
         {
-            "a_gi_pinkoin", // close
-            "a_gi_pinkoin", // far
+            "a_gi_pinkoin_close", // close
+            "a_gi_pinkoin_far", // far
             "a_gi_sword", // cheap-ish
             "a_gi_wizardstaff", // expensive
             "a_co_paladincork",
@@ -48,31 +49,34 @@ public class BehaviourAnalytics
             {
                 switch (goals[i])
                 {
-                    case "a_gi_pinkoin":
+                    case "a_gi_pinkoin_close":
                         {
                             List<string> actions = new List<string>();
-                            List<Tuple<string, double>> us;
-                            if (i == 0) // close
-                            {
-                                // personality, skills, utility for find, craftable
-                                us = UtilityScoring.ScoreGetItem(
-                                    npc.Value["personality"],
-                                    npc.Value["skills"],
-                                    10.0,
-                                    false
-                                    );
-                            }
-                            else // far
-                            {
-                                // personality, skills, utility for find, craftable
-                                us = UtilityScoring.ScoreGetItem(
-                                    npc.Value["personality"],
-                                    npc.Value["skills"],
-                                    98.0,
-                                    false
-                                    );
-                            }
+                            // personality, skills, utility for find, craftable
+                            List<Tuple<string, double>> us = UtilityScoring.ScoreGetItem(
+                                                            npc.Value["personality"],
+                                                            npc.Value["skills"],
+                                                            10.0,
+                                                            false
+                                                            );
 
+                            foreach (Tuple<string, double> t in us)
+                            {
+                                actions.Add(t.Item1);
+                            }
+                            generatedActionRanks[npc.Key].Add(goals[i], actions);
+                            break;
+                        }
+                    case "a_gi_pinkoin_far":
+                        {
+                            List<string> actions = new List<string>();
+                            // personality, skills, utility for find, craftable
+                            List<Tuple<string, double>> us = UtilityScoring.ScoreGetItem(
+                                                            npc.Value["personality"],
+                                                            npc.Value["skills"],
+                                                            98.0,
+                                                            false
+                                                            );
                             foreach (Tuple<string, double> t in us)
                             {
                                 actions.Add(t.Item1);
@@ -238,20 +242,35 @@ public class BehaviourAnalytics
 
 
         // scripted rankings
-
+        // NPC, Goal, Actions
         Dictionary<string, Dictionary<string, List<string>>> scriptedActionRanks = GetScriptedActionRankings();
 
-
-        string data = "";
+        
+        string data = "NPC\t\t\t" + String.Format("{0,-20}\t\t{1,-20}\t\t{2,-20}\t\t{3,-20}", "Goal", "HarmonicDWD", "GeometricCWD", "LevenshteinDistance") + "\n";
+        string actionData = "NPC\t\t\t" + String.Format("{0,-30}\t\t{1,-30}\t\t{2,-30}", "Goal", "Scripted", "Generated") + "\n";
         foreach (KeyValuePair<string, Dictionary<string, Dictionary<string, int>>> npc in testNPCs)
         {
-
+            data += npc.Key + "\n";
             for (int i = 0; i < goals.Count; ++i)
             {
-                // Evaluate and add to log data
 
+
+                // Evaluate and add to log data
+                //data += "\t\t\t" + goals[i] + " \t\t " + Evaluate(generatedActionRanks[npc.Key][goals[i]], 
+                //                                                    scriptedActionRanks[npc.Key][goals[i]]) + "\n";
+                data += "\t\t\t" + String.Format("{0,-20}\t\t{1,-20}",
+                                                    goals[i],
+                                                    Evaluate(scriptedActionRanks[npc.Key][goals[i]],
+                                                            generatedActionRanks[npc.Key][goals[i]])) + "\n";
+
+                // TODO python-like Join of elements in lists
+                actionData += "\t\t\t" + String.Format("{0,-30}\t\t{1,-30}",
+                                                    scriptedActionRanks[npc.Key][goals[i]],
+                                                    generatedActionRanks[npc.Key][goals[i]]) + "\n";
             }
         }
+        WriteDataToTextFile("./AnalyticsLogs", "Evaluation_", data);
+        WriteDataToTextFile("./AnalyticsLogs", "ActionLists_", actionData);
     }
 
 
@@ -259,7 +278,7 @@ public class BehaviourAnalytics
     // weight: 1/n for the nth element (1, 1/2, 1/3...)
     // e.g. "abcde" vs "abfgh" is not even 1
     // e.g. 2 completely disparate 13-character strings sum up to 3.18 aprox (a to m vs n to z)
-    private double HarmonicDivergentWeightedDifference(List<string> generatedRanking, List<string> scriptedRanking)
+    private static double HarmonicDivergentWeightedDifference(List<string> scriptedRanking, List<string> generatedRanking)
     {
         double score = 0.0;
         int x = 1;
@@ -298,7 +317,7 @@ public class BehaviourAnalytics
     // e.g. "abcde" vs "abfgh" is 0.13 aprox
     // e.g. "abcde" vs "fbcde" is 0.25
     // e.g. 2 completely disparate 13-character strings sum up to 0.576 aprox (a to m vs n to z)
-    private double GeometricConvergentDifference(List<string> generatedRanking, List<string> scriptedRanking)
+    private static double GeometricConvergentDifference(List<string> scriptedRanking, List<string> generatedRanking)
     {
         double score = 0.0;
         int x = 2;
@@ -358,18 +377,23 @@ public class BehaviourAnalytics
     // Probably return string
     // Evaluates the generated course of action against the expected one
     // Independently of eventual success or failure
-    public static string Evaluate(List<string> generatedRanking, List<string> scriptedRanking)
+    public static string Evaluate(List<string> scriptedRanking, List<string> generatedRanking)
     {
         string data = "";
-        
-
+               
+        data += String.Format("{0,-20}\t\t", HarmonicDivergentWeightedDifference(scriptedRanking, generatedRanking).ToString());
+        data += String.Format("{0,-20}\t\t", GeometricConvergentDifference(scriptedRanking, generatedRanking).ToString());
+        data += String.Format("{0,-20}\t\t", LevenshteinDistance(scriptedRanking, scriptedRanking.Count,
+                                                                    generatedRanking, generatedRanking.Count).ToString());
 
         return data;
     }
 
 
-    private static void WriteDataToTextFile(string path, string data)
+    private static void WriteDataToTextFile(string path, string fileprefix, string data)
     {
+        string filename = Path.Combine(path, fileprefix + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".txt");
+        File.WriteAllText(filename, data);
 
     }
 
@@ -647,11 +671,11 @@ public class BehaviourAnalytics
                 new Dictionary<string, List<string>>()
                 {
                     {
-                        "a_gi_pinkoin",
+                        "a_gi_pinkoin_close",
                         new List<string>(){ "find", "steal", "intimidate", "persuade" }
                     },
                     {
-                        "a_gi_pinkoin",
+                        "a_gi_pinkoin_far",
                         new List<string>(){ "steal", "intimidate", "persuade", "find" }
                     },
                     {
@@ -696,11 +720,11 @@ public class BehaviourAnalytics
                 "CharmingThief",new Dictionary<string, List<string>>()
                 {
                     {
-                        "a_gi_pinkoin",
+                        "a_gi_pinkoin_close",
                         new List<string>(){ "find", "persuade", "steal", "intimidate" }
                     },
                     {
-                        "a_gi_pinkoin",
+                        "a_gi_pinkoin_far",
                         new List<string>(){ "persuade", "steal", "intimidate", "find" }
                     },
                     {
@@ -745,11 +769,11 @@ public class BehaviourAnalytics
                 "Barbarian",new Dictionary<string, List<string>>()
                 {
                     {
-                        "a_gi_pinkoin",
+                        "a_gi_pinkoin_close",
                         new List<string>(){ "find", "intimidate", "steal" }
                     },
                     {
-                        "a_gi_pinkoin",
+                        "a_gi_pinkoin_far",
                         new List<string>(){ "intimidate", "steal", "find" }
                     },
                     {
@@ -794,11 +818,11 @@ public class BehaviourAnalytics
                 "Paladin",new Dictionary<string, List<string>>()
                 {
                     {
-                        "a_gi_pinkoin",
+                        "a_gi_pinkoin_close",
                         new List<string>(){ "find", "buy", "persuade", "intimidate" }
                     },
                     {
-                        "a_gi_pinkoin",
+                        "a_gi_pinkoin_far",
                         new List<string>(){ "buy", "persuade", "intimidate", "find" }
                     },
                     {
@@ -843,11 +867,11 @@ public class BehaviourAnalytics
                 "VirtuousRogue",new Dictionary<string, List<string>>()
                 {
                     {
-                        "a_gi_pinkoin",
+                        "a_gi_pinkoin_close",
                         new List<string>(){ "find", "persuade", "intimidate", "buy" }
                     },
                     {
-                        "a_gi_pinkoin",
+                        "a_gi_pinkoin_far",
                         new List<string>(){ "persuade", "intimidate", "buy", "find" }
                     },
                     {
@@ -892,11 +916,11 @@ public class BehaviourAnalytics
                 "Assassin",new Dictionary<string, List<string>>()
                 {
                     {
-                        "a_gi_pinkoin",
+                        "a_gi_pinkoin_close",
                         new List<string>(){ "find", "intimidate", "buy", "persuade" }
                     },
                     {
-                        "a_gi_pinkoin",
+                        "a_gi_pinkoin_far",
                         new List<string>(){ "intimidate", "buy", "persuade", "find" }
                     },
                     {
@@ -941,11 +965,11 @@ public class BehaviourAnalytics
                 "RudeMerchant",new Dictionary<string, List<string>>()
                 {
                     {
-                        "a_gi_pinkoin",
+                        "a_gi_pinkoin_close",
                         new List<string>(){ "find", "persuade", "intimidate", "buy" }
                     },
                     {
-                        "a_gi_pinkoin",
+                        "a_gi_pinkoin_far",
                         new List<string>(){ "persuade", "intimidate", "buy", "find" }
                     },
                     {
@@ -990,11 +1014,11 @@ public class BehaviourAnalytics
                 "NiceMerchant",new Dictionary<string, List<string>>()
                 {
                     {
-                        "a_gi_pinkoin",
+                        "a_gi_pinkoin_close",
                         new List<string>(){ "find", "persuade", "buy", "intimidate" }
                     },
                     {
-                        "a_gi_pinkoin",
+                        "a_gi_pinkoin_far",
                         new List<string>(){ "persuade", "buy", "intimidate", "find" }
                     },
                     {
