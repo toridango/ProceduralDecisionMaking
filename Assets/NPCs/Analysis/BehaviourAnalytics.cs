@@ -56,7 +56,7 @@ public class BehaviourAnalytics
                             List<Tuple<string, double>> us = UtilityScoring.ScoreGetItem(
                                                             npc.Value["personality"],
                                                             npc.Value["skills"],
-                                                            10.0,
+                                                            98.0,
                                                             false
                                                             );
 
@@ -74,7 +74,7 @@ public class BehaviourAnalytics
                             List<Tuple<string, double>> us = UtilityScoring.ScoreGetItem(
                                                             npc.Value["personality"],
                                                             npc.Value["skills"],
-                                                            98.0,
+                                                            10.0,
                                                             false
                                                             );
                             foreach (Tuple<string, double> t in us)
@@ -247,10 +247,11 @@ public class BehaviourAnalytics
 
         
         string data = "NPC\t\t\t" + String.Format("{0,-20}\t\t{1,-20}\t\t{2,-20}\t\t{3,-20}", "Goal", "HarmonicDWD", "GeometricCWD", "LevenshteinDistance") + "\n";
-        string actionData = "NPC\t\t\t" + String.Format("{0,-30}\t\t{1,-30}\t\t{2,-30}", "Goal", "Scripted", "Generated") + "\n";
+        string actionData = "NPC\t\t\t\t" + String.Format("{0,-30}\t\t{1,-40}\t\t{2,-40}", "Goal", "Scripted", "Generated") + "\n";
         foreach (KeyValuePair<string, Dictionary<string, Dictionary<string, int>>> npc in testNPCs)
         {
             data += npc.Key + "\n";
+            actionData += npc.Key + "\n";
             for (int i = 0; i < goals.Count; ++i)
             {
 
@@ -264,9 +265,10 @@ public class BehaviourAnalytics
                                                             generatedActionRanks[npc.Key][goals[i]])) + "\n";
 
                 // TODO python-like Join of elements in lists
-                actionData += "\t\t\t" + String.Format("{0,-30}\t\t{1,-30}",
-                                                    scriptedActionRanks[npc.Key][goals[i]],
-                                                    generatedActionRanks[npc.Key][goals[i]]) + "\n";
+                actionData += "\t\t\t\t" + String.Format("{0,-30}\t\t{1,-40}\t\t{2,-40}",
+                            goals[i],
+                            string.Join<string>(", " , scriptedActionRanks[npc.Key][goals[i]]),
+                            string.Join<string>(", ", generatedActionRanks[npc.Key][goals[i]])) + "\n";
             }
         }
         WriteDataToTextFile("./AnalyticsLogs", "Evaluation_", data);
