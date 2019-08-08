@@ -546,7 +546,7 @@ public class BehaviourAnalytics
                         {
                             {"pickpocket",  20},
                             {"stealth",     50},
-                            {"charisma",    30},
+                            {"charisma",    50},
                             {"crafts",      20},
                             {"combat",      60},
                             {"wealth",      30}
