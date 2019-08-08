@@ -723,19 +723,19 @@ public class BehaviourAnalytics
                 {
                     {
                         "a_gi_pinkoin_close",
-                        new List<string>(){ "find", "persuade", "steal", "intimidate" }
+                        new List<string>(){ "find", "steal", "persuade", "intimidate" }
                     },
                     {
                         "a_gi_pinkoin_far",
-                        new List<string>(){ "persuade", "steal", "intimidate", "find" }
+                        new List<string>(){ "steal", "persuade", "intimidate", "find" }
                     },
                     {
                         "a_gi_sword",
-                        new List<string>(){ "persuade", "steal", "intimidate" }
+                        new List<string>(){ "steal", "persuade", "intimidate" }
                     },
                     {
                         "a_gi_wizardstaff",
-                        new List<string>(){ "persuade", "steal", "intimidate" }
+                        new List<string>(){ "steal", "persuade", "intimidate" }
                     },
                     {
                         "a_co_paladincork",
@@ -825,15 +825,15 @@ public class BehaviourAnalytics
                     },
                     {
                         "a_gi_pinkoin_far",
-                        new List<string>(){ "buy", "persuade", "intimidate", "find" }
+                        new List<string>(){ "buy", "intimidate", "persuade", "find" }
                     },
                     {
                         "a_gi_sword",
-                        new List<string>(){ "buy", "persuade", "intimidate" }
+                        new List<string>(){ "buy", "intimidate", "persuade" }
                     },
                     {
                         "a_gi_wizardstaff",
-                        new List<string>(){ "buy", "persuade", "intimidate" }
+                        new List<string>(){ "buy", "intimidate", "persuade" }
                     },
                     {
                         "a_co_paladincork",
@@ -841,27 +841,27 @@ public class BehaviourAnalytics
                     },
                     {
                         "a_co_sneekibreeki",
-                        new List<string>(){ "persuade", "intimidate", "bribe" }
+                        new List<string>(){ "intimidate", "persuade", "bribe" }
                     },
                     {
                         "a_nu_paladincork",
-                        new List<string>(){ "persuade", "intimidate", "fight" }
+                        new List<string>(){ "intimidate", "persuade", "fight" }
                     },
                     {
                         "a_nu_sneekibreeki",
-                        new List<string>(){ "persuade", "intimidate", "fight" }
+                        new List<string>(){ "intimidate", "persuade", "fight" }
                     },
                     {
                         "a_dv_enchant",
-                        new List<string>(){ "outsource", "persuade", "intimidate" }
+                        new List<string>(){ "outsource", "intimidate", "persuade" }
                     },
                     {
                         "a_dv_house",
-                        new List<string>(){ "outsource", "persuade", "intimidate" }
+                        new List<string>(){ "outsource", "intimidate", "persuade" }
                     },
                     {
                         "a_dv_nails",
-                        new List<string>(){ "outsource", "persuade", "intimidate" }
+                        new List<string>(){ "outsource", "intimidate", "persuade" }
                     }
                 }
             },
@@ -968,47 +968,47 @@ public class BehaviourAnalytics
                 {
                     {
                         "a_gi_pinkoin_close",
-                        new List<string>(){ "find", "persuade", "intimidate", "buy" }
+                        new List<string>(){ "find", "buy", "persuade", "intimidate" }
                     },
                     {
                         "a_gi_pinkoin_far",
-                        new List<string>(){ "persuade", "intimidate", "buy", "find" }
+                        new List<string>(){ "persuade", "buy", "intimidate", "find" }
                     },
                     {
                         "a_gi_sword",
-                        new List<string>(){ "persuade", "intimidate", "buy" }
+                        new List<string>(){ "persuade", "buy", "intimidate" }
                     },
                     {
                         "a_gi_wizardstaff",
-                        new List<string>(){ "persuade", "intimidate", "buy" }
+                        new List<string>(){ "persuade", "buy", "intimidate" }
                     },
                     {
                         "a_co_paladincork",
-                        new List<string>(){ "persuade", "intimidate", "bribe" }
+                        new List<string>(){ "persuade", "bribe", "intimidate" }
                     },
                     {
                         "a_co_sneekibreeki",
-                        new List<string>(){ "persuade", "intimidate", "bribe" }
+                        new List<string>(){ "persuade", "bribe", "intimidate" }
                     },
                     {
                         "a_nu_paladincork",
-                        new List<string>(){ "persuade", "intimidate", "bribe" }
+                        new List<string>(){ "persuade", "bribe", "intimidate" }
                     },
                     {
                         "a_nu_sneekibreeki",
-                        new List<string>(){ "persuade", "intimidate", "bribe" }
+                        new List<string>(){ "persuade", "bribe", "intimidate" }
                     },
                     {
                         "a_dv_enchant",
-                        new List<string>(){ "persuade", "intimidate", "outsource" }
+                        new List<string>(){ "persuade", "outsource", "intimidate" }
                     },
                     {
                         "a_dv_house",
-                        new List<string>(){ "persuade", "intimidate", "outsource" }
+                        new List<string>(){ "persuade", "outsource", "intimidate" }
                     },
                     {
                         "a_dv_nails",
-                        new List<string>(){ "persuade", "intimidate", "outsource" }
+                        new List<string>(){ "persuade", "outsource", "intimidate" }
                     }
                 }
             },

@@ -206,7 +206,7 @@ public class DialogManager : MonoBehaviour
 
             UpdateDialog();
 
-            if (exitCode.StartsWith("q") || exitCode.StartsWith("a"))
+            if (exitCode.StartsWith("q") || exitCode.StartsWith("a") || exitCode.StartsWith("t"))
             {
                 StartCoroutine(WaitSecondsAndQuitDialog(2));
             }
