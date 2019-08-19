@@ -56,6 +56,7 @@ public class UtilityScoring
 
     }
 
+    // Score all actions for convince and sort them by value
     public static List<Tuple<string, double>> ScoreConvince( Dictionary<string, int> personality,
                                                             Dictionary<string, int> skills)
     {
@@ -84,6 +85,7 @@ public class UtilityScoring
 
     }
 
+    // Score all actions for neutralise and sort them by value
     public static List<Tuple<string, double>> ScoreNeutralize(  Dictionary<string, int> personality,
                                                                 Dictionary<string, int> skills,
                                                                 double allegianceToTarget)
@@ -111,6 +113,7 @@ public class UtilityScoring
 
     }
 
+    // Score all actions for develop and sort them by value
     public static List<Tuple<string, double>> ScoreDevelop(   Dictionary<string, int> personality,
                                                                 Dictionary<string, int> skills)
     {
@@ -146,6 +149,7 @@ public class UtilityScoring
 
 
 
+    // Given confidence, return the m in y=mx to calculate perceived skill (y) from real skill (x)
     private static double SlopeGivenConfidence(double confidence)
     {
         double c = confidence / 100.0;
@@ -164,12 +168,14 @@ public class UtilityScoring
         return slope;
     }
 
+    // Calculate perceived skill from real skill and confidence
     private static double PerceivedSkill(double realSkill, double confidence)
     {
         return SlopeGivenConfidence(confidence) * realSkill;
     }
 
-
+    // Utility for steal action
+    // Sigmoid shape
     private static double UtilitySteal(double conscience, double confidence, double pickpocket, double stealth)
     {
         double p = PerceivedSkill(pickpocket, confidence);
@@ -183,6 +189,8 @@ public class UtilityScoring
         return skillProductMod * p * s + halfSize + -sigmoidSize / (1 + Math.Exp(-sigmoidHardness * conscience));
     }
 
+    // Utility for buy action
+    // Sine shape
     private static double UtilityBuy(double wealth, double carelessness)
     {
         double multiplier = 0.4;
@@ -192,6 +200,8 @@ public class UtilityScoring
         return multiplier * wealth * (padding + Math.Sin(xMod * carelessness));
     }
 
+    // Utility for steal action
+    // Sigmoid shape
     private static double UtilityPersuade(double charisma, double friendliness, double confidence)
     {
         double c = PerceivedSkill(charisma, confidence);
@@ -205,6 +215,8 @@ public class UtilityScoring
         return vertOffset + sigmoidSize / (1 + Math.Exp(-xMod * c - friendliness / frDivisor));
     }
 
+    // Utility for steal action
+    // Sigmoid shape
     private static double UtilityIntimidate(double combat, double friendliness, double confidence)
     {
         double c = PerceivedSkill(combat, confidence);
@@ -218,6 +230,8 @@ public class UtilityScoring
         return vertOffset + sigmoidSize / (1 + Math.Exp(-xMod * c + friendliness / frDivisor));
     }
 
+    // Utility for craft action
+    // Exponential shape
     private static double UtilityCraft(double crafts, double confidence)
     {
         double c = PerceivedSkill(crafts, confidence);
@@ -227,8 +241,10 @@ public class UtilityScoring
         return xMod * Math.Pow(c, 2);
 
     }
-    
 
+
+    // Utility for fight action
+    // Sigmoid shape
     private static double UtilityFight(double combat, double allegiance, double confidence, double friendliness)
     {
         double c = PerceivedSkill(combat, confidence);
@@ -237,6 +253,8 @@ public class UtilityScoring
         return -friendliness / 5 + 1.5 * allegiance + -3 * allegiance / (1 + Math.Exp(-sigmoidHardness * c));
     }
 
+    // Utility for assassinate action
+    // Sigmoid shape
     private static double UtilityAssassinate(double combat, double stealth, double allegiance, double confidence, double friendliness)
     {
         double c = PerceivedSkill(combat, confidence);
@@ -247,6 +265,8 @@ public class UtilityScoring
 
     }
 
+    // Utility for buy action, modified to be less preferred
+    // Sine shape
     private static double UtilityHardBuy(double wealth, double carelessness)
     {
         double multiplier = 0.4;
@@ -256,6 +276,8 @@ public class UtilityScoring
         return multiplier * wealth * (padding + Math.Sin(xMod * carelessness));
     }
 
+    // Utility for persuade action, modified to be less preferred
+    // sigmoid shape
     private static double UtilityHardPersuade(double charisma, double friendliness, double confidence)
     {
         double c = PerceivedSkill(charisma, confidence);
@@ -269,6 +291,8 @@ public class UtilityScoring
         return vertOffset + sigmoidSize / (1 + Math.Exp(-xMod * c - friendliness / frDivisor));
     }
 
+    // Utility for intimidate action, modified to be less preferred
+    // sigmoid shape
     private static double UtilityHardIntimidate(double combat, double friendliness, double confidence)
     {
         double c = PerceivedSkill(combat, confidence);
@@ -282,6 +306,8 @@ public class UtilityScoring
         return vertOffset + sigmoidSize / (1 + Math.Exp(-xMod * c + friendliness / frDivisor));
     }
 
+    // Utility for craft action, modified to be less preferred
+    // exmponential shape
     private static double UtilityHardCraft(double crafts, double confidence)
     {
         double c = PerceivedSkill(crafts, confidence);

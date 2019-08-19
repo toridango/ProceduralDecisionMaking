@@ -1,6 +1,8 @@
 ﻿
 using System.Collections.Generic;
 
+
+// BT abstract node
 public abstract class Node
 {
 

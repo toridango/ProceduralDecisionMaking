@@ -30,6 +30,7 @@ public class DialogManager : MonoBehaviour
                                 "Option6", "Option7", "Option8", "Option9" };
 
     // Start is called before the first frame update
+    // Initialise dialog ui elements
     void Start()
     {
         optionButtons = new List<Button>();
@@ -43,14 +44,14 @@ public class DialogManager : MonoBehaviour
         }
 
         NPCs = GameObject.FindGameObjectsWithTag("NPC");
-
-        //Text dialogText = dialogCanvas.gameObject.transform.Find("Text Dialog").GetComponent<Text>();
+        
         dialogContainer.gameObject.SetActive(dialogActive);
         interactPromptContainer.gameObject.SetActive(dialogActive);
 
     }
 
     // Update is called once per frame
+    // Handle keypresses, interact prompt, dialog start
     void Update()
     {
 
@@ -109,7 +110,7 @@ public class DialogManager : MonoBehaviour
         }
     }
 
-
+    // Get closest gameobject to transform
     public GameObject GetClosest(Transform targetTrans, List<GameObject> gos)
     {
 
@@ -132,8 +133,7 @@ public class DialogManager : MonoBehaviour
     }
 
 
-    // TODO: Give control of dialog text and choices to NPC
-    // Change parameter to NPC in dialog and get information from them
+    // Lock player movement and enable dialog UI
     public void StartDialog()
     {
         dialogActive = true;
@@ -141,7 +141,7 @@ public class DialogManager : MonoBehaviour
 
 
         FirstPersonController fpc = playerController.GetComponent<FirstPersonController>();
-        //Debug.Log(fpc.ToString());
+
         fpc.SendMessage("DialogLock");
         playerController.GetComponent<FirstPersonController>().enabled = false;
 
@@ -149,6 +149,7 @@ public class DialogManager : MonoBehaviour
 
     }
 
+    // Update premise text and dialog option buttons
     public void UpdateDialog()
     {
         Page currentPage = interactTarget.GetComponent<NPC>().GetDialog().GetCurrentPage();
@@ -165,10 +166,9 @@ public class DialogManager : MonoBehaviour
             else
                 optionButtons[i].gameObject.SetActive(false);
         }
-
-
     }
 
+    // Quit dialog: disable UI elements and reset content and objects involved
     public void QuitDialog()
     {
         dialogActive = false;
@@ -176,33 +176,23 @@ public class DialogManager : MonoBehaviour
 
         dialogContainer.gameObject.SetActive(dialogActive);
         interactTarget.GetComponent<NPC>().GetDialog().Reset();
-        interactTarget = null;
-
-        /*playerController.GetComponent<FirstPersonController>().enabled = true;
-
-        FirstPersonController fpc = playerController.GetComponent<FirstPersonController>();
-        fpc.SendMessage("DialogUnlock");*/
-
-
+        interactTarget = null;       
     }
 
-    public void SetChoiceVisibility(int num)
-    {
-    }
     
-
+    
+    // Set text in the dialog's premise window
     public void SetText(string s)
     {
         dialogText.text = s;
     }
 
-
+    // Acces dialog object to get the exit code for the choice, then updates the object
     public void MakeChoice(int choice)
     {
         if(interactTarget != null)
         {
             string exitCode = interactTarget.GetComponent<NPC>().MakeDialogChoice(choice-1);
-            //Debug.Log(exitCode);
 
             UpdateDialog();
 
@@ -213,6 +203,7 @@ public class DialogManager : MonoBehaviour
         }
     }
 
+    // Waits for specified seconds and exits current dialog
     public IEnumerator WaitSecondsAndQuitDialog(int seconds)
     {
 
@@ -221,74 +212,10 @@ public class DialogManager : MonoBehaviour
         FirstPersonController fpc = playerController.GetComponent<FirstPersonController>();
         fpc.SendMessage("DialogUnlock");
 
-
-        //Debug.Log("Exiting dialog in " + seconds.ToString() + " seconds");
+        
         yield return new WaitForSeconds(seconds);
         QuitDialog();
 
     }
-
-
-    public IEnumerator GetChoice()
-    {
-
-        string[] keyNames = {
-                            "Option1",
-                            "Option2",
-                            "Option3",
-                            "Option4",
-                            "Option5",
-                            "Option6",
-                            "Option7",
-                            "Option8",
-                            "Option9"
-                         };
-
-
-        // While not any is true (all are false). Note for self: array.Any(<var> => <condition on var>)
-        //while (!numKeys.Any(item => item))
-
-
-        int sum = 0;
-        string option = "";
-
-        do
-        {
-            option = "";
-            foreach (string s in keyNames)
-            {
-                if(CrossPlatformInputManager.GetButtonDown(s))
-                {
-                    sum++;
-                    option = s; 
-                }
-            }
-            yield return null;
-
-        } while (sum != 1);
-
-        switch( Array.IndexOf(keyNames, option) + 1)
-        {
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                break;
-            case 5:
-                break;
-            case 6:
-                break;
-            case 7:
-                break;
-            case 8:
-                break;
-            case 9:
-                break;
-            default:
-                break;
-        }
-    }
+    
 }

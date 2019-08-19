@@ -1,5 +1,5 @@
 ﻿
-
+// BT Leaf node for delegate function that takes a string and NPC parameters
 public class VersusActionNode : Node
 {
 

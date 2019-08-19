@@ -1,6 +1,8 @@
 ﻿
 using System.Collections.Generic;
 
+// BT Selector node:
+// runs children until one succeeds or all fail
 public class Selector : Node
 {
     

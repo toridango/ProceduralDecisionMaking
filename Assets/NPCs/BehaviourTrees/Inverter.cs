@@ -1,6 +1,9 @@
 ﻿
 using System.Collections.Generic;
 
+
+// BT Decorator node:
+// inverts output of child node
 public class Inverter : Node
 {
 

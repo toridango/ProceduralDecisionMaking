@@ -1,5 +1,6 @@
 ﻿
 
+// BT Leaf node for delegate function that takes two string parameters
 public class ThresholdActionNode : Node
 {
 

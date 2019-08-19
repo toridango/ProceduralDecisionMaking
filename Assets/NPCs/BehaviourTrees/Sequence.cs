@@ -1,6 +1,8 @@
 ﻿
 using System.Collections.Generic;
 
+// BT Sequence node:
+// runs children until one fails or all succeed
 public class Sequence : Node
 {
 

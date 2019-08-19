@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
+// Handles page's components: premise, options and their pointers/exitcodes
 public class Page
 {
     private string m_premise;

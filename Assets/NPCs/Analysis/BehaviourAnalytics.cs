@@ -9,12 +9,9 @@ public class BehaviourAnalytics
     {
     }
 
+    // Main Method of the Class, takes care of all steps of the analytics (from initialisation to saving the results in text files
     public static void PerformAnalytics()
     {
-        // simulated NPCs       
-        //Dictionary<string, int> m_personality;
-        //Dictionary<string, int> m_skills;
-        //Dictionary<string, int> m_allegiances;
 
         Dictionary<string, Dictionary<string, Dictionary<string, int>>> testNPCs = MakeTestNPCs();
 
@@ -123,7 +120,7 @@ public class BehaviourAnalytics
                     case "a_co_paladincork":
                         {
                             List<string> actions = new List<string>();
-                            // personality, skills, utility for find, craftable
+                            // personality, skills
                             List<Tuple<string, double>> us = UtilityScoring.ScoreConvince(
                                                             npc.Value["personality"],
                                                             npc.Value["skills"]
@@ -139,7 +136,7 @@ public class BehaviourAnalytics
                     case "a_co_sneekibreeki":
                         {
                             List<string> actions = new List<string>();
-                            // personality, skills, utility for find, craftable
+                            // personality, skills
                             List<Tuple<string, double>> us = UtilityScoring.ScoreConvince(
                                                             npc.Value["personality"],
                                                             npc.Value["skills"]
@@ -155,7 +152,7 @@ public class BehaviourAnalytics
                     case "a_nu_paladincork":
                         {
                             List<string> actions = new List<string>();
-                            // personality, skills, utility for find, craftable
+                            // personality, skills, allegiance to target NPC
                             List<Tuple<string, double>> us = UtilityScoring.ScoreNeutralize(
                                                             npc.Value["personality"],
                                                             npc.Value["skills"],
@@ -172,7 +169,7 @@ public class BehaviourAnalytics
                     case "a_nu_sneekibreeki":
                         {
                             List<string> actions = new List<string>();
-                            // personality, skills, utility for find, craftable
+                            // personality, skills, allegiance to target NPC
                             List<Tuple<string, double>> us = UtilityScoring.ScoreNeutralize(
                                                             npc.Value["personality"],
                                                             npc.Value["skills"],
@@ -189,7 +186,7 @@ public class BehaviourAnalytics
                     case "a_dv_enchant":
                         {
                             List<string> actions = new List<string>();
-                            // personality, skills, utility for find, craftable
+                            // personality, skills
                             List<Tuple<string, double>> us = UtilityScoring.ScoreDevelop(
                                                             npc.Value["personality"],
                                                             npc.Value["skills"]
@@ -205,7 +202,7 @@ public class BehaviourAnalytics
                     case "a_dv_house":
                         {
                             List<string> actions = new List<string>();
-                            // personality, skills, utility for find, craftable
+                            // personality, skills
                             List<Tuple<string, double>> us = UtilityScoring.ScoreDevelop(
                                                             npc.Value["personality"],
                                                             npc.Value["skills"]
@@ -221,7 +218,7 @@ public class BehaviourAnalytics
                     case "a_dv_nails":
                         {
                             List<string> actions = new List<string>();
-                            // personality, skills, utility for find, craftable
+                            // personality, skills
                             List<Tuple<string, double>> us = UtilityScoring.ScoreDevelop(
                                                             npc.Value["personality"],
                                                             npc.Value["skills"]
@@ -257,14 +254,12 @@ public class BehaviourAnalytics
 
 
                 // Evaluate and add to log data
-                //data += "\t\t\t" + goals[i] + " \t\t " + Evaluate(generatedActionRanks[npc.Key][goals[i]], 
-                //                                                    scriptedActionRanks[npc.Key][goals[i]]) + "\n";
                 data += "\t\t\t" + String.Format("{0,-20}\t\t{1,-20}",
                                                     goals[i],
                                                     Evaluate(scriptedActionRanks[npc.Key][goals[i]],
                                                             generatedActionRanks[npc.Key][goals[i]])) + "\n";
 
-                // TODO python-like Join of elements in lists
+                
                 actionData += "\t\t\t\t" + String.Format("{0,-30}\t\t{1,-40}\t\t{2,-40}",
                             goals[i],
                             string.Join<string>(", " , scriptedActionRanks[npc.Key][goals[i]]),
@@ -360,17 +355,17 @@ public class BehaviourAnalytics
     {
         int cost;
 
-        /* base case: empty strings */
+        // base case: empty strings 
         if (len_s == 0) return len_t;
         if (len_t == 0) return len_s;
 
-        /* test if last characters of the strings match */
+        // test if last characters of the strings match 
         if (s[len_s - 1] == t[len_t - 1])
             cost = 0;
         else
             cost = 1;
 
-        /* return minimum of delete char from s, delete char from t, and delete char from both */
+        // return minimum of delete char from s, delete char from t, and delete char from both
         return Math.Min(LevenshteinDistance(s, len_s - 1, t, len_t) + 1,
                Math.Min(LevenshteinDistance(s, len_s, t, len_t - 1) + 1,
                        LevenshteinDistance(s, len_s - 1, t, len_t - 1) + cost));
@@ -392,6 +387,7 @@ public class BehaviourAnalytics
     }
 
 
+    // Writes passed data in a txt file in the passed path with the current time and passed prefix in the name
     private static void WriteDataToTextFile(string path, string fileprefix, string data)
     {
         string filename = Path.Combine(path, fileprefix + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".txt");
@@ -400,7 +396,8 @@ public class BehaviourAnalytics
     }
 
 
-
+    // Creates and returns a dictionary with the stored information about the Test NPCs such that
+    // NPC = Dictionary[NPCName]
     private static Dictionary<string, Dictionary<string, Dictionary<string, int>>> MakeTestNPCs()
     {
         Dictionary<string, Dictionary<string, Dictionary<string, int>>> testNPCs = new Dictionary<string, Dictionary<string, Dictionary<string, int>>>
@@ -662,9 +659,10 @@ public class BehaviourAnalytics
     }
 
 
+    // Scripted action rankings. Returns a Dictionary such that
+    // ActionRanking = Dictionary[NPC][Goal]
     private static Dictionary<string, Dictionary<string, List<string>>> GetScriptedActionRankings()
     {
-        //List<string> actionRanking = new List<string>();
 
         Dictionary<string, Dictionary<string, List<string>>> scriptedActionRanks = new Dictionary<string, Dictionary<string, List<string>>>()
         {
