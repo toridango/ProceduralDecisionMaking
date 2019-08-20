@@ -204,7 +204,16 @@ public class NPC : MonoBehaviour
     {
         if (m_overheadMessageQ.Count > 0)
         {
+            // Update if next is different
             if (m_currOverheadMessage != m_overheadMessageQ.Peek())
+            {
+                m_currOverheadMessage = m_overheadMessageQ.Dequeue();
+                m_overheadTextDescription.text = m_currOverheadMessage;
+                m_overheadMessageTimestamp = Time.realtimeSinceStartup;
+            }
+            // If it's the same
+            // Update if there are messages waiting and current one has been there for more than 2 seconds
+            else if (m_overheadMessageQ.Count > 1 && Time.realtimeSinceStartup - m_overheadMessageTimestamp > 2)
             {
                 m_currOverheadMessage = m_overheadMessageQ.Dequeue();
                 m_overheadTextDescription.text = m_currOverheadMessage;
